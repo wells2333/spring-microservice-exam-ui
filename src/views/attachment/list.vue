@@ -24,7 +24,6 @@
       v-loading="listLoading"
       :key="tableKey"
       :data="list"
-      :default-sort="{ prop: 'id', order: 'descending' }"
       border
       highlight-current-row
       style="width: 100%;"

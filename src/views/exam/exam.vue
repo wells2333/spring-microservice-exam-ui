@@ -223,7 +223,6 @@
       <el-table
         v-loading="subject.listLoading"
         :data="subject.list"
-        :default-sort="{ prop: 'serial_number', order: 'descending' }"
         border
         highlight-current-row
         style="width: 100%;"
@@ -274,7 +273,6 @@
         <el-row>
           <el-col :span="12">
             <el-form-item :label="$t('table.subjectName')" prop="subjectName">
-              <tinymce :height="300" v-model="content"/>
               <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.subjectName" type="textarea"/>
             </el-form-item>
           </el-col>
@@ -430,7 +428,7 @@
             <el-table
               v-loading="category.listLoading"
               :data="category.list"
-              :default-sort="{ prop: 'id', order: 'descending' }"
+              :default-sort="{ prop: 'id', order: 'ascending' }"
               border
               highlight-current-row
               style="width: 100%;"
@@ -471,6 +469,15 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="category.dialogVisible = false">{{ $t('table.cancel') }}</el-button>
         <el-button type="primary" @click="handleSelectSubject">{{ $t('table.confirm') }}</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 富文本编辑 -->
+    <el-dialog :visible.sync="tinymce.dialogTinymceVisible" :title="$t('table.edit')">
+      <tinymce ref="editor" :height="300" v-model="tinymce.tempValue" />
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="tinymce.dialogTinymceVisible = false">{{ $t('table.cancel') }}</el-button>
+        <el-button type="primary" @click="updateTinymceData">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -532,10 +539,6 @@ export default {
   },
   data() {
     return {
-      content:
-        `<h1 style="text-align: center;">Welcome to the TinyMCE demo!</h1><p style="text-align: center; font-size: 15px;"><img title="TinyMCE Logo" src="//www.tinymce.com/images/glyph-tinymce@2x.png" alt="TinyMCE Logo" width="110" height="97" /><ul>
-        <li>Our <a href="//www.tinymce.com/docs/">documentation</a> is a great resource for learning how to configure TinyMCE.</li><li>Have a specific question? Visit the <a href="https://community.tinymce.com/forum/">Community Forum</a>.</li><li>We also offer enterprise grade support as part of <a href="https://tinymce.com/pricing">TinyMCE premium subscriptions</a>.</li>
-      </ul>`,
       headers: {
         Authorization: 'Bearer ' + getToken()
       },
@@ -573,8 +576,8 @@ export default {
           pageSize: 10,
           examinationId: '',
           categoryId: '',
-          sort: 'create_date',
-          order: 'descending'
+          sort: 'serial_number',
+          order: 'ascending'
         },
         list: null,
         total: null,
@@ -607,6 +610,7 @@ export default {
       // 题目临时信息
       tempSubject: {
         id: '',
+        serialNumber: '',
         examinationId: '',
         categoryId: '',
         subjectName: '',
@@ -696,8 +700,8 @@ export default {
         listQuery: {
           subjectName: undefined,
           categoryId: undefined,
-          sort: '',
-          order: ''
+          sort: 'serial_number',
+          order: 'ascending'
         },
         // 题目列表数据
         list: [],
@@ -711,6 +715,10 @@ export default {
         // 列表加载状态
         listLoading: false,
         tempRadio: ''
+      },
+      tinymce: {
+        dialogTinymceVisible: false,
+        tempValue: ''
       }
     }
   },
@@ -1022,10 +1030,11 @@ export default {
       this.category.dialogVisible = true
       // 加载题目列表
     },
-    resetTempSubject() {
+    resetTempSubject(serialNumber, score) {
       this.tempSubject = {
         id: '',
         examinationId: '',
+        serialNumber: '',
         subjectName: '',
         type: 0,
         content: '',
@@ -1039,6 +1048,15 @@ export default {
         score: '',
         analysis: '',
         level: 2
+      }
+      // 默认序号
+      if (isNotEmpty(serialNumber)) {
+        this.tempSubject.serialNumber = serialNumber
+      }
+
+      // 默认分数
+      if (isNotEmpty(score)) {
+        this.tempSubject.score = score
       }
     },
     // 修改题目
@@ -1106,7 +1124,7 @@ export default {
           // 创建
           if (this.dialogStatus === 'create') {
             addSubject(this.tempSubject).then(() => {
-              this.resetTempSubject()
+              this.resetTempSubject(parseInt(this.tempSubject.serialNumber) + 1, tempData.score)
               this.dialogStatus = 'create'
               this.$nextTick(() => {
                 this.$refs['dataSubjectForm'].clearValidate()
@@ -1117,7 +1135,7 @@ export default {
           } else {
             // 修改
             putSubject(tempData).then(() => {
-              this.resetTempSubject()
+              this.resetTempSubject(parseInt(tempData.serialNumber) + 1, tempData.score)
               this.dialogStatus = 'create'
               this.$nextTick(() => {
                 this.$refs['dataSubjectForm'].clearValidate()
@@ -1268,12 +1286,22 @@ export default {
     },
     getExaminationAvatar(avatar) {
       return getAttachmentPreviewUrl(this.sysConfig, avatar)
+    },
+    // 输入
+    handleInputTinymce(value) {
+      this.tinymce.tempValue = value
+      this.tinymce.dialogTinymceVisible = true
+    },
+    // 富文本保存
+    updateTinymceData() {
+      console.log(this.$refs.editor.getContent())
+      this.tinymce.dialogTinymceVisible = false
     }
   }
 }
 </script>
 
-<style scoped>
+<style rel="stylesheet/scss" lang="scss" scoped>
   .avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
@@ -1286,5 +1314,8 @@ export default {
     width: 178px;
     height: 178px;
     display: block;
+  }
+  .editor-content{
+    margin-top: 20px;
   }
 </style>

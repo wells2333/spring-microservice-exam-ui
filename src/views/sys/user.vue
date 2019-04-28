@@ -232,8 +232,8 @@ export default {
         born: '',
         sex: 0,
         status: 0,
-        deptId: -1,
-        roleId: -1,
+        deptId: null,
+        roleId: null,
         roleList: []
       },
       dialogFormVisible: false,
@@ -321,11 +321,9 @@ export default {
       fetchList(this.listQuery).then(response => {
         this.list = response.data.list
         this.total = response.data.total
-
-        // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
-        }, 500)
+        }, 100)
       })
     },
     handleFilter() {
@@ -356,8 +354,8 @@ export default {
         born: '',
         status: 0,
         readonly: false,
-        deptId: -1,
-        roleId: -1,
+        deptId: null,
+        roleId: null,
         roleData: [],
         role: []
       }

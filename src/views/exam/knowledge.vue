@@ -116,7 +116,7 @@ export default {
       return statusMap[status]
     },
     statusFilter(status) {
-      return status == '0' ? '已发布' : '未发布'
+      return status == '0' ? '启用' : '禁用'
     }
   },
   data() {
@@ -340,7 +340,7 @@ export default {
         notifyFail(this, '删除失败')
       })
     },
-    // 发布知识
+    // 启用知识
     handlePublic(row, status) {
       const tempData = Object.assign({}, row)
       tempData.status = status

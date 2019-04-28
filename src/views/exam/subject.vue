@@ -262,7 +262,7 @@ import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/exam/subjectCat
 import { fetchSubjectBankList, addSubjectBank, putSubjectBank, delSubjectBank, delAllSubjectBank, exportSubjectBank } from '@/api/exam/subjectBank'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
-import { checkMultipleSelect, exportExcel, notifySuccess, notifyFail } from '@/utils/util'
+import { checkMultipleSelect, exportExcel, notifySuccess, notifyFail, isNotEmpty } from '@/utils/util'
 import waves from '@/directive/waves'
 
 export default {
@@ -308,8 +308,8 @@ export default {
       listQuery: {
         subjectName: undefined,
         categoryId: undefined,
-        sort: '',
-        order: ''
+        sort: 'serial_number',
+        order: 'ascending'
       },
       treeData: [],
       oExpandedKey: {
@@ -615,11 +615,11 @@ export default {
         sort: 30
       }
     },
-    resetTempSubject() {
+    resetTempSubject(serialNumber, score) {
       this.tempSubject = {
         id: '',
         examinationId: '',
-        categoryId: '',
+        serialNumber: '',
         subjectName: '',
         type: 0,
         content: '',
@@ -633,6 +633,15 @@ export default {
         score: '',
         analysis: '',
         level: 2
+      }
+      // 默认序号
+      if (isNotEmpty(serialNumber)) {
+        this.tempSubject.serialNumber = serialNumber
+      }
+
+      // 默认分数
+      if (isNotEmpty(score)) {
+        this.tempSubject.score = score
       }
     },
     // 加载题目
@@ -723,13 +732,15 @@ export default {
     updateAndAddSubjectData() {
       this.$refs['dataSubjectForm'].validate((valid) => {
         if (valid) {
-          // 绑定分类ID
-          this.tempSubject.categoryId = this.currentCategoryId
+          if (isNotEmpty(this.currentCategoryId)) {
+            // 绑定分类ID
+            this.tempSubject.categoryId = this.currentCategoryId
+          }
           const tempData = Object.assign({}, this.tempSubject)
           // 创建
           if (this.subjectFormStatus === 'create') {
             addSubjectBank(tempData).then(() => {
-              this.resetTempSubject()
+              this.resetTempSubject(parseInt(tempData.serialNumber) + 1, tempData.score)
               this.subjectFormStatus = 'create'
               this.$nextTick(() => {
                 this.$refs['dataSubjectForm'].clearValidate()
@@ -740,7 +751,7 @@ export default {
           } else {
             // 更新
             putSubjectBank(tempData).then(() => {
-              this.resetTempSubject()
+              this.resetTempSubject(parseInt(tempData.serialNumber) + 1, tempData.score)
               this.subjectFormStatus = 'create'
               // 绑定分类ID
               this.tempSubject.categoryId = this.currentCategoryId
