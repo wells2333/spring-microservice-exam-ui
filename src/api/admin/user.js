@@ -2,7 +2,7 @@ import request from '@/router/axios'
 
 const baseUserUrl = '/api/user/v1/user/'
 
-export function fetchList(query) {
+export function fetchList (query) {
   return request({
     url: baseUserUrl + 'userList',
     method: 'get',
@@ -10,7 +10,7 @@ export function fetchList(query) {
   })
 }
 
-export function addObj(obj) {
+export function addObj (obj) {
   return request({
     url: baseUserUrl,
     method: 'post',
@@ -18,21 +18,21 @@ export function addObj(obj) {
   })
 }
 
-export function getObj(id) {
+export function getObj (id) {
   return request({
     url: baseUserUrl + id,
     method: 'get'
   })
 }
 
-export function delObj(id) {
+export function delObj (id) {
   return request({
     url: baseUserUrl + id,
     method: 'delete'
   })
 }
 
-export function putObj(obj) {
+export function putObj (obj) {
   return request({
     url: baseUserUrl,
     method: 'put',
@@ -40,7 +40,7 @@ export function putObj(obj) {
   })
 }
 
-export function updateObjInfo(obj) {
+export function updateObjInfo (obj) {
   return request({
     url: baseUserUrl + 'updateInfo',
     method: 'put',
@@ -48,7 +48,7 @@ export function updateObjInfo(obj) {
   })
 }
 
-export function delAllObj(obj) {
+export function delAllObj (obj) {
   return request({
     url: baseUserUrl + 'deleteAll',
     method: 'post',
@@ -57,7 +57,7 @@ export function delAllObj(obj) {
 }
 
 // 导出
-export function exportObj(obj) {
+export function exportObj (obj) {
   return request({
     url: baseUserUrl + 'export',
     method: 'post',
@@ -67,3 +67,11 @@ export function exportObj(obj) {
   })
 }
 
+// 重置密码
+export function resetPassword (obj) {
+  return request({
+    url: baseUserUrl + 'resetPassword',
+    method: 'put',
+    data: obj
+  })
+}

@@ -1,19 +1,18 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input :placeholder="$t('table.username')" v-model="listQuery.username" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
+      <el-input placeholder="输入账号查询" v-model="listQuery.username" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.query') }}</el-button>
       <el-button v-if="user_btn_add" class="filter-item" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
       <el-button v-if="user_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
       <el-button v-if="user_btn_import" class="filter-item" icon="el-icon-upload2" plain @click="handleImport">{{ $t('table.import') }}</el-button>
       <el-button v-if="user_btn_export" class="filter-item" icon="el-icon-download" plain @click="handleExport">{{ $t('table.export') }}</el-button>
     </div>
+    <spinner-loading v-if="listLoading"/>
     <el-table
-      v-loading="listLoading"
       ref="multipleTable"
       :key="tableKey"
       :data="list"
-      border
       highlight-current-row
       style="width: 100%;"
       @cell-dblclick="handleUpdate"
@@ -25,31 +24,47 @@
           <span>{{ scope.row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.name')" sortable prop="name" min-width="110">
+      <el-table-column :label="$t('table.name')" min-width="110">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.ownDept')" width="210px" align="center">
+      <el-table-column :label="$t('table.sex')">
+        <template slot-scope="scope">
+          <span>{{ scope.row.sex | sexFilter}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.ownDept')">
         <template slot-scope="scope">
           <span>{{ scope.row.deptName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.role')" width="210px" align="center">
+      <el-table-column :label="$t('table.role')">
         <template slot-scope="scope">
           <span v-for="role in scope.row.roleList" :key="role.id">{{ role.roleName }} </span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.status')" sortable prop="status" align="center" width="95px">
+      <el-table-column :label="$t('table.phone')">
+        <template slot-scope="scope">
+          <span>{{ scope.row.phone }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.email')">
+        <template slot-scope="scope">
+          <span>{{ scope.row.email }}</span>
+        </template>
+       </el-table-column>
+      <el-table-column :label="$t('table.status')">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
+      <el-table-column :label="$t('table.actions')" class-name="status-col">
         <template slot-scope="scope">
-          <el-button v-if="user_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="user_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
-          </el-button>
+          <el-button v-if="user_btn_edit" type="text"  @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="user_btn_edit  && scope.row.status === '0'" type="text" @click="handleEnableOrDisable(scope.row, '1')">{{ $t('table.disable') }}</el-button>
+          <el-button v-else type="text" @click="handleEnableOrDisable(scope.row, '0')">{{ $t('table.enable') }}</el-button>
+          <el-button v-if="user_btn_edit" type="text" @click="handleResetPassword(scope.row)">{{ $t('table.resetPassword') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -81,11 +96,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item :label="$t('table.role')" prop="role">
-              <el-select v-model="temp.role" class="filter-item" placeholder="请选择角色" multiple width="100%">
-                <el-option v-for="item in roleData" :key="item.id" :label="item.roleName" :value="item.id">
-                  <span style="float: left">{{ item.roleName }}</span>
-                </el-option>
-              </el-select>
+              <el-input v-model="temp.roleName" placeholder="请选择角色" @focus="handleSelectRole"/>
               <input v-model="temp.roleId" type="hidden">
             </el-form-item>
           </el-col>
@@ -135,6 +146,7 @@
       </div>
     </el-dialog>
 
+    <!-- 部门列表 -->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogDeptVisible">
       <el-row>
         <el-col :span="5" style ="margin-top:10px;">
@@ -154,6 +166,43 @@
           />
         </el-col>
       </el-row>
+    </el-dialog>
+
+    <!-- 角色列表 -->
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogRoleVisible">
+      <el-table
+        v-loading="roleListLoading"
+        :data="roleData"
+        highlight-current-row
+        style="width: 100%;"
+        @row-click = "handleSingleRoleSelection"
+        @current-change="handleSingleRoleCurrentChange"
+        @cell-dblclick="updateRoleData">
+        <el-table-column align="center" width="55" label="" >
+          <template slot-scope="scope">
+            <el-radio :label="scope.$index" v-model="tempRadio" @change.native="handleSingleRoleSelectionChange(scope.$index, scope.row)">&nbsp;</el-radio>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('table.roleCode')" min-width="20">
+          <template slot-scope="scope">
+            <span>{{ scope.row.roleCode }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('table.roleName')" min-width="20">
+          <template slot-scope="scope">
+            <span>{{ scope.row.roleName }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('table.roleDesc')" min-width="20">
+          <template slot-scope="scope">
+            <span>{{ scope.row.roleDesc }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogRoleVisible = false">{{ $t('table.cancel') }}</el-button>
+        <el-button type="primary" @click="updateRoleData">{{ $t('table.confirm') }}</el-button>
+      </div>
     </el-dialog>
 
     <!-- 导入用户 -->
@@ -181,40 +230,57 @@
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj, delAllObj, exportObj } from '@/api/admin/user'
+import { fetchList, addObj, putObj, delObj, delAllObj, exportObj, resetPassword, updateObjInfo } from '@/api/admin/user'
+import { allRoles } from '@/api/admin/role'
 import waves from '@/directive/waves'
 import { fetchTree } from '@/api/admin/dept'
-import { deptRoleList } from '@/api/admin/role'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
-import { checkMultipleSelect, exportExcel, isNotEmpty, notifySuccess, messageSuccess } from '@/utils/util'
+import { checkMultipleSelect, exportExcel, isNotEmpty, notifySuccess, notifyFail, messageSuccess } from '@/utils/util'
+import SpinnerLoading from '@/components/SpinnerLoading'
 
 export default {
   name: 'User',
+  components: {
+    SpinnerLoading
+  },
   directives: {
     waves
   },
   filters: {
-    statusTypeFilter(status) {
+    statusTypeFilter (status) {
       const statusMap = {
         0: 'success',
         1: 'danger'
       }
       return statusMap[status]
     },
-    statusFilter(status) {
+    statusFilter (status) {
       return status === '0' ? '启用' : '禁用'
     },
-    typeFilter(type) {
-      return calendarTypeKeyValue[type]
+    sexFilter (type) {
+      const sexMap = {
+        0: '男',
+        1: '女'
+      }
+      return sexMap[type]
     }
   },
-  data() {
+  data () {
+    // 校验手机号码
+    const checkPhone = (rule, value, callback) => {
+      if (!(/^1[34578]\d{9}$/.test(value))) {
+        callback(new Error('请输入正确的手机号码!'))
+      } else {
+        callback()
+      }
+    }
     return {
       tableKey: 0,
       list: null,
       total: null,
       listLoading: true,
+      roleListLoading: true,
       multipleSelection: [],
       listQuery: {
         pageNum: 1,
@@ -234,8 +300,9 @@ export default {
         status: 0,
         deptId: null,
         roleId: null,
-        roleList: []
+        role: []
       },
+      tempRole: null,
       dialogFormVisible: false,
       dialogDeptVisible: false,
       dialogRoleVisible: false,
@@ -245,15 +312,14 @@ export default {
         update: '编辑',
         create: '新建'
       },
-      pvData: [],
       rules: {
         name: [{ required: true, message: '请输入账号', trigger: 'change' }],
-        username: [{ required: true, message: '请输入姓名', trigger: 'change' }]
+        username: [{ required: true, message: '请输入姓名', trigger: 'change' }],
+        phone: [{ required: true, message: '请输入手机号码', trigger: 'change' }, { validator: checkPhone, trigger: 'change' }]
       },
       downloadLoading: false,
       treeDeptData: [],
       roleData: [],
-      role: [],
       defaultDeptProps: {
         children: 'children',
         label: 'deptName'
@@ -269,10 +335,11 @@ export default {
         Authorization: 'Bearer ' + getToken()
       },
       uploading: false,
-      percentage: 0
+      percentage: 0,
+      tempRadio: 0
     }
   },
-  created() {
+  created () {
     this.getList()
     this.user_btn_add = this.permissions['sys:user:add']
     this.user_btn_edit = this.permissions['sys:user:edit']
@@ -287,7 +354,7 @@ export default {
     ])
   },
   methods: {
-    nodeCollapse(data) {
+    nodeCollapse (data) {
       this.oExpandedKey[data.id] = false
       // 如果有子节点
       this.treeRecursion(this.oTreeNodeChildren[data.id], (oNode) => {
@@ -295,7 +362,7 @@ export default {
       })
       this.setExpandedKeys()
     },
-    setExpandedKeys() {
+    setExpandedKeys () {
       const oTemp = this.oExpandedKey
       this.aExpandedKeys = []
       for (const sKey in oTemp) {
@@ -304,11 +371,11 @@ export default {
         }
       }
     },
-    filterNode(value, data) {
+    filterNode (value, data) {
       if (!value) return true
       return data.label.indexOf(value) !== -1
     },
-    nodeExpand(data) {
+    nodeExpand (data) {
       const aChildren = data.children
       if (aChildren.length > 0) {
         this.oExpandedKey[data.id] = true
@@ -316,36 +383,36 @@ export default {
       }
       this.setExpandedKeys()
     },
-    getList() {
+    getList () {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
         this.list = response.data.list
         this.total = response.data.total
         setTimeout(() => {
           this.listLoading = false
-        }, 100)
+        }, 500)
       })
     },
-    handleFilter() {
+    handleFilter () {
       this.listQuery.pageNum = 1
       this.getList()
     },
-    handleSizeChange(val) {
+    handleSizeChange (val) {
       this.listQuery.pageSize = val
       this.getList()
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       this.listQuery.pageNum = val
       this.getList()
     },
-    handleModifyStatus(row, status) {
+    handleModifyStatus (row, status) {
       row.status = status
       putObj(row).then(() => {
         this.dialogFormVisible = false
         messageSuccess(this, '操作成功')
       })
     },
-    resetTemp() {
+    resetTemp () {
       this.temp = {
         id: '',
         username: '',
@@ -356,11 +423,10 @@ export default {
         readonly: false,
         deptId: null,
         roleId: null,
-        roleData: [],
         role: []
       }
     },
-    handleCreate() {
+    handleCreate () {
       this.role = []
       this.roleData = []
       this.resetTemp()
@@ -370,7 +436,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    createData() {
+    createData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           addObj(this.temp).then(() => {
@@ -382,43 +448,28 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
-      row.role = []
+    handleUpdate (row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.sex = parseInt(this.temp.sex)
       this.temp.status = parseInt(this.temp.status)
       this.temp.readonly = true
       this.dialogStatus = 'update'
-      this.role = []
+      if (isNotEmpty(this.temp.roleList) && this.temp.roleList.length > 0) {
+        this.tempRole = this.temp.roleList[0]
+        this.temp.roleId = this.tempRole.id
+        this.temp.roleName = this.tempRole.roleName
+        this.temp.role = [].concat(this.temp.roleId)
+      }
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
-      // 根据部门ID获取角色
-      if (isNotEmpty(row.deptId)) {
-        deptRoleList(row.deptId).then(response => {
-          if (isNotEmpty(row.roleList)) {
-            for (let i = 0; i < row.roleList.length; i++) {
-              this.role[i] = row.roleList[i].id
-            }
-          }
-          this.temp.role = this.role
-          this.roleData = response.data
-        })
-      }
     },
-    updateData() {
+    updateData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           putObj(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
             this.dialogFormVisible = false
             this.getList()
             notifySuccess(this, '更新成功')
@@ -426,7 +477,7 @@ export default {
         }
       })
     },
-    handleDelete(row) {
+    handleDelete (row) {
       this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -441,7 +492,7 @@ export default {
       }).catch(() => {})
     },
     // 批量删除
-    handleDeletes() {
+    handleDeletes () {
       if (checkMultipleSelect(this.multipleSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
@@ -460,8 +511,32 @@ export default {
         }).catch(() => {})
       }
     },
+    // 启用禁用
+    handleEnableOrDisable (row, status) {
+      row.status = status
+      const msg = status === '0' ? '启用' : '禁用'
+      updateObjInfo(row).then(() => {
+        this.getList()
+        notifySuccess(this, msg + '成功')
+      }).catch(() => {
+        notifyFail(this, msg + '失败')
+      })
+    },
+    // 重置密码
+    handleResetPassword (row) {
+      this.$confirm('确定要重置吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        resetPassword(row).then(() => {
+          this.dialogFormVisible = false
+          notifySuccess(this, '重置成功')
+        })
+      }).catch(() => {})
+    },
     // 导出
-    handleExport() {
+    handleExport () {
       if (this.multipleSelection.length === 0) {
         this.$confirm('确定要导出全部用户数据吗?', '提示', {
           confirmButtonText: '确定',
@@ -485,44 +560,56 @@ export default {
       }
     },
     // 导入
-    handleImport() {
+    handleImport () {
       this.dialogImportVisible = true
     },
-    handleSelectionChange(val) {
+    handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    sortChange(column, prop, order) {
+    sortChange (column, prop, order) {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
       this.getList()
     },
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => {
-        return v[j]
-      }))
-    },
-    handleSelectDept() {
+    handleSelectDept () {
       fetchTree().then(response => {
         this.treeDeptData = response.data
         this.dialogDeptVisible = true
-        this.role = ''
-        if (isNotEmpty(this.treeDeptData.id)) {
-          deptRoleList(this.treeDeptData.id).then(response => {
-            this.roleData = response.data
-          })
-        }
       })
     },
-    getDeptNodeData(data) {
+    getDeptNodeData (data) {
       this.dialogDeptVisible = false
       this.temp.deptId = data.id
       this.temp.deptName = data.deptName
-      deptRoleList(data.id).then(response => {
-        this.roleData = response.data
+    },
+    handleSelectRole () {
+      allRoles().then(response => {
+        this.roleData = response.data.data
+        this.dialogRoleVisible = true
+        this.roleListLoading = false
       })
     },
+    // 选中角色
+    handleSingleRoleSelection (row) {
+      this.tempRadio = this.roleData.indexOf(row)
+    },
+    // 表格变化
+    handleSingleRoleCurrentChange (row) {
+      this.tempRole = row
+    },
+    handleSingleRoleSelectionChange (index, row) {
+      this.tempRole = row
+    },
+    updateRoleData () {
+      this.dialogRoleVisible = false
+      if (isNotEmpty(this.tempRole)) {
+        this.temp.roleId = this.tempRole.id
+        this.temp.role = [].concat(this.tempRole.id)
+        this.temp.roleName = this.tempRole.roleName
+      }
+    },
     // 上传前
-    beforeUploadUserUpload(file) {
+    beforeUploadUserUpload (file) {
       const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       const isLt10M = file.size / 1024 / 1024 < 10
       if (!isExcel) {
@@ -533,12 +620,12 @@ export default {
       }
       return isExcel && isLt10M
     },
-    handleUploadProgress(event, file, fileList) {
+    handleUploadProgress (event, file, fileList) {
       this.uploading = true
       this.percentage = parseInt(file.percentage.toFixed(0))
     },
     // 上传成功
-    handleUploadUserSuccess() {
+    handleUploadUserSuccess () {
       console.log('upload success.')
       this.dialogImportVisible = false
       this.uploading = false

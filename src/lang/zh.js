@@ -83,6 +83,7 @@ export default {
   login: {
     title: '欢迎使用考试管理系统',
     logIn: '登录',
+    tenantCode: '单位ID',
     username: '账号',
     password: '密码',
     any: '随便填',
@@ -122,6 +123,7 @@ export default {
     type: '类型',
     remark: '备注',
     search: '搜索',
+    query: '查询',
     add: '新增',
     del: '删除',
     import: '导入',
@@ -134,7 +136,7 @@ export default {
     status: '状态',
     isDefault: '是否默认',
     actions: '操作',
-    edit: '编辑',
+    edit: '修改',
     publish: '发布',
     draft: '草稿',
     delete: '删除',
@@ -150,12 +152,13 @@ export default {
     born: '出生日期',
     enable: '启用',
     disable: '禁用',
+    resetPassword: '重置密码',
     roleName: '角色名称',
     roleCode: '角色代码',
     roleDesc: '角色描述',
-    ownDept: '所属部门',
+    ownDept: '部门',
     role: '角色',
-    permission: '权限',
+    permission: '分配权限',
     attachment: '附件',
     attachName: '附件名称',
     attachSize: '附件大小',
@@ -203,7 +206,10 @@ export default {
       userName: '姓名',
       deptName: '部门',
       score: '成绩',
-      examTime: '考试时间'
+      examTime: '考试时间',
+      submitStatus: '状态',
+      details: '成绩详情',
+      marking: '批改'
     },
     knowledge: {
       knowledgeName: '名称',
@@ -230,8 +236,8 @@ export default {
       clientSecretPlainText: '密钥明文',
       scope: '授权范围',
       authorizedGrantTypes: '授权类型',
-      accessTokenValidity: '令牌有效时间(秒)',
-      refreshTokenValidity: '刷新令牌有效时间(秒)'
+      accessTokenValidity: 'token有效期',
+      refreshTokenValidity: 'refresh_token有效期'
     },
     route: {
       routeId: '路由ID',
@@ -242,6 +248,12 @@ export default {
       sort: '排序',
       status: '状态',
       refresh: '刷新路由'
+    },
+    tenant: {
+      tenantCode: '单位标识',
+      tenantName: '单位名称',
+      tenantDesc: '单位描述',
+      status: '状态'
     }
   },
   excel: {

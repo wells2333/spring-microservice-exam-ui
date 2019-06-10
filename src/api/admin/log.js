@@ -2,7 +2,7 @@ import request from '@/router/axios'
 
 const baseLogUrl = '/api/user/v1/log/'
 
-export function fetchList(query) {
+export function fetchList (query) {
   return request({
     url: baseLogUrl + 'logList',
     method: 'get',
@@ -10,14 +10,14 @@ export function fetchList(query) {
   })
 }
 
-export function delObj(id) {
+export function delObj (id) {
   return request({
     url: baseLogUrl + id,
     method: 'delete'
   })
 }
 
-export function delAllObj(obj) {
+export function delAllObj (obj) {
   return request({
     url: baseLogUrl + 'deleteAll',
     method: 'post',

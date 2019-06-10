@@ -22,7 +22,7 @@ import { initMenu, setUrlPath } from '@/utils/util'
 
 export default {
   components: { SidebarItem },
-  created() {
+  created () {
     if (validatenull(this.menu)) {
       this.$store.dispatch('GetMenu').then(data => {
         initMenu(this.$router, data)
@@ -31,7 +31,7 @@ export default {
   },
   computed: {
     ...mapGetters(['menu', 'tag', 'isCollapse']),
-    nowTagValue: function() {
+    nowTagValue: function () {
       return setUrlPath(this.$route)
     }
   }

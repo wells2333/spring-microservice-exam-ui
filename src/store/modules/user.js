@@ -31,7 +31,7 @@ const user = {
   },
   actions: {
     // 根据用户名登录
-    LoginByUsername({
+    LoginByUsername ({
       commit,
       state,
       dispatch
@@ -43,7 +43,7 @@ const user = {
           param: ['password']
         })
 
-        loginByUsername(user.username, user.password, user.code, user.randomStr).then(response => {
+        loginByUsername(user.tenantCode, user.username, user.password, user.code, user.randomStr).then(response => {
           const data = response.data
           setToken(data.access_token)
           setRefreshToken(data.refresh_token)
@@ -56,7 +56,7 @@ const user = {
         })
       })
     },
-    GetUserInfo({
+    GetUserInfo ({
       commit,
       state,
       dispatch
@@ -82,7 +82,7 @@ const user = {
       })
     },
     // 登出
-    LogOut({
+    LogOut ({
       commit,
       state
     }) {
@@ -109,7 +109,7 @@ const user = {
       })
     },
     // 注销session
-    FedLogOut({
+    FedLogOut ({
       commit
     }) {
       return new Promise(resolve => {
@@ -126,12 +126,12 @@ const user = {
         // 清除附件配置信息
         commit('SET_SYS_CONFIG', {})
         removeToken()
-        removeRefreshToken
+        removeRefreshToken()
         resolve()
       })
     },
     // 获取系统菜单
-    GetMenu({ commit }) {
+    GetMenu ({ commit }) {
       return new Promise(resolve => {
         GetMenu().then((res) => {
           const data = res.data
@@ -147,44 +147,39 @@ const user = {
     }
   },
   mutations: {
-    SET_ACCESS_TOKEN: (state, access_token) => {
-      state.access_token = access_token
+    SET_ACCESS_TOKEN: (state, accessToken) => {
+      state.access_token = accessToken
       setStore({
         name: 'access_token',
-        content: state.access_token,
-        type: 'session'
+        content: state.access_token
       })
     },
     SET_MENU: (state, menu) => {
       state.menu = menu
       setStore({
         name: 'menu',
-        content: state.menu,
-        type: 'session'
+        content: state.menu
       })
     },
     SET_USER_INFO: (state, userInfo) => {
       state.userInfo = userInfo
       setStore({
         name: 'userInfo',
-        content: state.userInfo,
-        type: 'session'
+        content: state.userInfo
       })
     },
     SET_REFRESH_TOKEN: (state, rfToken) => {
       state.refresh_token = rfToken
       setStore({
         name: 'refresh_token',
-        content: state.refresh_token,
-        type: 'session'
+        content: state.refresh_token
       })
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
       setStore({
         name: 'roles',
-        content: state.roles,
-        type: 'session'
+        content: state.roles
       })
     },
     SET_PERMISSIONS: (state, permissions) => {
@@ -195,8 +190,7 @@ const user = {
       state.permissions = list
       setStore({
         name: 'permissions',
-        content: state.permissions,
-        type: 'session'
+        content: state.permissions
       })
     }
   }

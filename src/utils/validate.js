@@ -1,32 +1,29 @@
-export function isvalidUsername(str) {
+export function isvalidUsername (str) {
   return str.length > 0
 }
 
-/* 合法uri*/
-export function validateURL(textval) {
+export function validateURL (textval) {
   const urlregex = /^(https?|ftp):\/\/([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/
   return urlregex.test(textval)
 }
 
-/* 小写字母*/
-export function validateLowerCase(str) {
+export function validateLowerCase (str) {
   const reg = /^[a-z]+$/
   return reg.test(str)
 }
 
-/* 大写字母*/
-export function validateUpperCase(str) {
+export function validateUpperCase (str) {
   const reg = /^[A-Z]+$/
   return reg.test(str)
 }
 
-/* 大小写字母*/
-export function validatAlphabets(str) {
+/* 大小写字母 */
+export function validatAlphabets (str) {
   const reg = /^[A-Za-z]+$/
   return reg.test(str)
 }
 
-export const vaildatePc = function() {
+export const vaildatePc = function () {
   const userAgentInfo = navigator.userAgent
   const Agents = ['Android', 'iPhone',
     'SymbianOS', 'Windows Phone',
@@ -42,19 +39,9 @@ export const vaildatePc = function() {
 }
 
 /**
- * validate email
- * @param email
- * @returns {boolean}
- */
-export function validateEmail(email) {
-  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-  return re.test(email)
-}
-
-/**
  * 判断身份证号码
  */
-export function cardid(code) {
+export function cardid (code) {
   const list = []
   let result = true
   let msg = ''
@@ -133,7 +120,7 @@ export function cardid(code) {
 /**
  * 判断手机号码是否正确
  */
-export function isvalidatemobile(phone) {
+export function isvalidatemobile (phone) {
   const list = []
   let result = true
   let msg = ''
@@ -159,7 +146,7 @@ export function isvalidatemobile(phone) {
 /**
  * 判断姓名是否正确
  */
-export function validatename(name) {
+export function validatename (name) {
   var regName = /^[\u4e00-\u9fa5]{2,4}$/
   if (!regName.test(name)) {
     return false
@@ -170,7 +157,7 @@ export function validatename(name) {
 /**
  * 判断是否为整数
  */
-export function validatenum(num, type) {
+export function validatenum (num, type) {
   let regName = /[^\d.]/g
   if (type === 1) {
     if (!regName.test(num)) {
@@ -188,7 +175,7 @@ export function validatenum(num, type) {
 /**
  * 判断是否为小数
  */
-export function validatenumord(num, type) {
+export function validatenumord (num, type) {
   let regName = /[^\d.]/g
   if (type === 1) {
     if (!regName.test(num)) {
@@ -206,7 +193,7 @@ export function validatenumord(num, type) {
 /**
  * 判断是否为空
  */
-export function validatenull(val) {
+export function validatenull (val) {
   if (val instanceof Array) {
     if (val.length === 0) {
       return true

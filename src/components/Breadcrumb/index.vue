@@ -10,27 +10,27 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters } from 'vuex'
 
 export default {
-  data() {
+  data () {
     return {
       levelList: null
     }
   },
   watch: {
-    $route() {
+    $route () {
       this.getBreadcrumb()
     }
   },
-  created() {
+  created () {
     this.getBreadcrumb()
   },
   computed: {
-    ...mapGetters(["tag", "menu"])
+    ...mapGetters(['tag', 'menu'])
   },
   methods: {
-    getBreadcrumb() {
+    getBreadcrumb () {
       let matched = this.$route.matched.filter(item => item.name)
       const first = matched[0]
       if (first) {
@@ -46,15 +46,15 @@ export default {
               if (currentMenu.children) {
                 for (let j = 0; j < currentMenu.children.length; j++) {
                   if (currentMenu.children[j].name === this.tag.label) {
-                    tags.push({ path: currentMenu.path, name: currentMenu.name, meta: { title: currentMenu.name }})
+                    tags.push({ path: currentMenu.path, name: currentMenu.name, meta: { title: currentMenu.name } })
                   }
                 }
               }
             }
           }
-          matched = tags.concat([{ path: this.tag.value, name: this.tag.label, meta: { title: this.tag.label }}])
+          matched = tags.concat([{ path: this.tag.value, name: this.tag.label, meta: { title: this.tag.label } }])
         } else if (lowerFirst !== 'Dashboard'.toLocaleLowerCase()) {
-          matched = [{ path: '/dashboard', meta: { title: '首页' }}].concat(matched)
+          matched = [{ path: '/dashboard', meta: { title: '首页' } }].concat(matched)
         }
       }
       this.levelList = matched

@@ -78,7 +78,7 @@ export default {
   name: 'DeptManagement',
   components: {},
   filters: {
-    typeFilter(type) {
+    typeFilter (type) {
       const typeMap = {
         0: '菜单',
         1: '按钮'
@@ -86,7 +86,7 @@ export default {
       return typeMap[type]
     }
   },
-  data() {
+  data () {
     return {
       list: null,
       total: null,
@@ -129,7 +129,7 @@ export default {
       dept_btn_del: false
     }
   },
-  created() {
+  created () {
     this.getList()
     this.dept_btn_add = this.permissions['sys:dept:add']
     this.dept_btn_edit = this.permissions['sys:dept:edit']
@@ -142,16 +142,16 @@ export default {
     ])
   },
   methods: {
-    getList() {
+    getList () {
       fetchTree(this.listQuery).then(response => {
         this.treeData = response.data
       })
     },
-    filterNode(value, data) {
+    filterNode (value, data) {
       if (!value) return true
       return data.label.indexOf(value) !== -1
     },
-    nodeExpand(data) {
+    nodeExpand (data) {
       const aChildren = data.children
       if (aChildren.length > 0) {
         this.oExpandedKey[data.id] = true
@@ -159,7 +159,7 @@ export default {
       }
       this.setExpandedKeys()
     },
-    nodeCollapse(data) {
+    nodeCollapse (data) {
       this.oExpandedKey[data.id] = false
       // 如果有子节点
       this.treeRecursion(this.oTreeNodeChildren[data.id], (oNode) => {
@@ -167,7 +167,7 @@ export default {
       })
       this.setExpandedKeys()
     },
-    setExpandedKeys() {
+    setExpandedKeys () {
       const oTemp = this.oExpandedKey
       this.aExpandedKeys = []
       for (const sKey in oTemp) {
@@ -176,7 +176,7 @@ export default {
         }
       }
     },
-    treeRecursion(aChildren, fnCallback) {
+    treeRecursion (aChildren, fnCallback) {
       if (aChildren) {
         for (let i = 0; i < aChildren.length; ++i) {
           const oNode = aChildren[i]
@@ -186,7 +186,7 @@ export default {
       }
     },
 
-    getNodeData(data) {
+    getNodeData (data) {
       this.formStatus = 'update'
       getObj(data.id).then(response => {
         this.form = response.data
@@ -195,16 +195,16 @@ export default {
       this.currentId = data.id
       this.showElement = true
     },
-    handlerEdit() {
+    handlerEdit () {
       if (this.form.id) {
         this.formStatus = 'update'
       }
     },
-    handlerAdd() {
+    handlerAdd () {
       this.resetForm()
       this.formStatus = 'create'
     },
-    handleDelete() {
+    handleDelete () {
       if (!isNotEmpty(this.currentId)) {
         this.$message({
           message: '请选择要删除的记录',
@@ -225,7 +225,7 @@ export default {
         })
       }).catch(() => {})
     },
-    create() {
+    create () {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           if (this.form.id) {
@@ -242,10 +242,10 @@ export default {
         }
       })
     },
-    onCancel() {
+    onCancel () {
       this.formStatus = ''
     },
-    resetForm() {
+    resetForm () {
       let parentId
       if (this.form.id === undefined) {
         parentId = -1

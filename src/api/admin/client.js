@@ -2,14 +2,14 @@ import request from '@/router/axios'
 
 const baseClientUrl = '/api/auth/v1/client/'
 
-export function clientList() {
+export function clientList () {
   return request({
     url: baseClientUrl + 'clientList',
     method: 'get'
   })
 }
 
-export function fetchList(query) {
+export function fetchList (query) {
   return request({
     url: baseClientUrl + 'clientList',
     method: 'get',
@@ -17,14 +17,14 @@ export function fetchList(query) {
   })
 }
 
-export function getObj(id) {
+export function getObj (id) {
   return request({
     url: baseClientUrl + id,
     method: 'get'
   })
 }
 
-export function addObj(obj) {
+export function addObj (obj) {
   return request({
     url: baseClientUrl,
     method: 'post',
@@ -32,7 +32,7 @@ export function addObj(obj) {
   })
 }
 
-export function putObj(obj) {
+export function putObj (obj) {
   return request({
     url: baseClientUrl,
     method: 'put',
@@ -40,14 +40,14 @@ export function putObj(obj) {
   })
 }
 
-export function delObj(id) {
+export function delObj (id) {
   return request({
     url: baseClientUrl + id,
     method: 'delete'
   })
 }
 
-export function delAllObj(obj) {
+export function delAllObj (obj) {
   return request({
     url: baseClientUrl + 'deleteAll',
     method: 'post',

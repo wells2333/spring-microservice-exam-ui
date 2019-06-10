@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
-Vue.use(Router)
 import Layout from '@/views/layout/Layout'
 import { formatRoutes } from '@/utils/util'
 import store from '@/store'
+
+Vue.use(Router)
 
 /** note: Submenu only appear when children.length>=1
  *  detail see  https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -48,12 +48,28 @@ export const constantRouterMap = [
   },
   {
     path: '/404',
-    component: () => import('@/views/errorPage/404'),
+    component: Layout,
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/errorPage/404'),
+        name: '404',
+        title: '404'
+      }
+    ],
     hidden: true
   },
   {
     path: '/401',
-    component: () => import('@/views/errorPage/401'),
+    component: Layout,
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/errorPage/401'),
+        name: '401',
+        title: '401'
+      }
+    ],
     hidden: true
   },
   {

@@ -4,7 +4,7 @@
 
 const path = require('path')
 
-const proxyConfig = require('./proxyConfig');
+const proxyConfig = require('./proxyConfig')
 
 module.exports = {
   dev: {

@@ -49,7 +49,7 @@ import { notifySuccess, notifyFail, isNotEmpty } from '@/utils/util'
 export default {
   name: 'PersonalPassword',
   components: {},
-  data() {
+  data () {
     const validatePass = (rule, value, callback) => {
       if (this.userInfo.oldPassword !== '') {
         if (!isNotEmpty(value)) {
@@ -91,7 +91,7 @@ export default {
     })
   },
   methods: {
-    update() {
+    update () {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           updateObjInfo(this.userInfo).then(response => {

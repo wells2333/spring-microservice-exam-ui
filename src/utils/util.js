@@ -56,7 +56,7 @@ export const formatRoutes = (aMenu) => {
     if (!validatenull(component)) {
       const oRouter = {
         path: path,
-        component(resolve) {
+        component (resolve) {
           let componentPath = ''
           if (component === 'Layout') {
             require(['../views/layout/Layout.vue'], resolve)
@@ -92,19 +92,19 @@ export const fullscreenToggel = () => {
  * esc监听全屏
  */
 export const listenfullscreen = (callback) => {
-  function listen() {
+  function listen () {
     callback()
   }
-  document.addEventListener('fullscreenchange', function(e) {
+  document.addEventListener('fullscreenchange', function (e) {
     listen()
   })
-  document.addEventListener('mozfullscreenchange', function(e) {
+  document.addEventListener('mozfullscreenchange', function (e) {
     listen()
   })
-  document.addEventListener('webkitfullscreenchange', function(e) {
+  document.addEventListener('webkitfullscreenchange', function (e) {
     listen()
   })
-  document.addEventListener('msfullscreenchange', function(e) {
+  document.addEventListener('msfullscreenchange', function (e) {
     listen()
   })
 }
@@ -236,7 +236,7 @@ export const checkMultipleSelect = (multipleSelection, obj) => {
 /**
  * 设置浏览器头部标题
  */
-export const setTitle = function(title) {
+export const setTitle = function (title) {
   title = title ? `${title}——在线考试` : '在线考试'
   window.document.title = title
 }
@@ -244,7 +244,7 @@ export const setTitle = function(title) {
 /**
  * 导出Excel
  */
-export const exportExcel = function(response) {
+export const exportExcel = function (response) {
   const blob = new Blob([response.data], { type: 'application/vnd.ms-excel;charset=utf-8' })
   const link = document.createElement('a')
   link.href = window.URL.createObjectURL(blob)
@@ -262,7 +262,7 @@ export const exportExcel = function(response) {
  * @param fastFileId
  * @returns {string}
  */
-export const getAttachmentPreviewUrl = function(sysConfig, fastFileId) {
+export const getAttachmentPreviewUrl = function (sysConfig, fastFileId) {
   let url = ''
   if (isNotEmpty(sysConfig.fdfsHttpHost)) {
     url = sysConfig.fdfsHttpHost + '/' + fastFileId

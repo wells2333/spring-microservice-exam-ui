@@ -9,67 +9,64 @@
       <el-button v-if="exam_btn_add" class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
       <el-button v-if="exam_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
     </div>
-
+    <spinner-loading v-if="listLoading"/>
     <!--考试列表-->
     <el-table
-      v-loading="listLoading"
       :key="tableKey"
       :data="list"
       :default-sort="{ prop: 'id', order: 'descending' }"
-      border
       highlight-current-row
       style="width: 100%;"
       @cell-dblclick="handleUpdate"
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.examinationName')" sortable prop="examination_name" min-width="90" align="center">
+      <el-table-column :label="$t('table.examinationName')">
         <template slot-scope="scope">
           <span>{{ scope.row.examinationName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.type')" sortable prop="type" min-width="90" align="center">
+      <el-table-column :label="$t('table.type')">
         <template slot-scope="scope">
           <span>{{ scope.row.type | typeFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.course')" min-width="90" align="center">
+      <el-table-column :label="$t('table.course')">
         <template slot-scope="scope">
-          <span>{{ scope.row.course.courseName }}</span>
+          <span>{{ scope.row | courseFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.startTime')" sortable prop="start_time" min-width="90" align="center">
+      <el-table-column :label="$t('table.startTime')" sortable prop="start_time">
         <template slot-scope="scope">
           <span>{{ scope.row.startTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.endTime')" sortable prop="end_time" min-width="90" align="center">
+      <el-table-column :label="$t('table.endTime')" sortable prop="end_time">
         <template slot-scope="scope">
           <span>{{ scope.row.endTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.totalSubject')" sortable prop="total_subject" align="center" width="120px">
+      <el-table-column :label="$t('table.totalSubject')">
         <template slot-scope="scope">
           <span>{{ scope.row.totalSubject }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.totalScore')" sortable prop="total_score" align="center" width="120px">
+      <el-table-column :label="$t('table.totalScore')">
         <template slot-scope="scope">
           <span>{{ scope.row.totalScore }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.status')" sortable prop="status" align="center" width="120px">
+      <el-table-column :label="$t('table.status')">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col" width="400px">
+      <el-table-column :label="$t('table.actions')" class-name="status-col">
         <template slot-scope="scope">
-          <el-button v-if="exam_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="exam_btn_edit && scope.row.status == 1" type="warning" size="mini" @click="handlePublic(scope.row, 0)">{{ $t('table.public') }}</el-button>
-          <el-button v-if="exam_btn_edit&& scope.row.status == 0" type="success" size="mini" @click="handlePublic(scope.row, 1)">{{ $t('table.retrieve') }}</el-button>
-          <el-button v-if="exam_btn_subject" size="mini" @click="handleSubjectManagement(scope.row)">{{ $t('table.subjectManagement') }}</el-button>
-          <el-button v-if="exam_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
+          <el-button v-if="exam_btn_edit" type="text" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="exam_btn_edit && scope.row.status == 1" type="text" @click="handlePublic(scope.row, 0)">{{ $t('table.public') }}</el-button>
+          <el-button v-if="exam_btn_edit&& scope.row.status == 0" type="text" @click="handlePublic(scope.row, 1)">{{ $t('table.retrieve') }}</el-button>
+          <el-button v-if="exam_btn_subject" type="text" @click="handleSubjectManagement(scope.row)">{{ $t('table.subjectManagement') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -221,9 +218,8 @@
         <el-button v-if="exam_btn_subject_export" class="filter-item" icon="el-icon-download" plain @click="handleExportSubject">{{ $t('table.export') }}</el-button>
       </div>
       <el-table
-        v-loading="subject.listLoading"
         :data="subject.list"
-        border
+        v-loading="subject.listLoading"
         highlight-current-row
         style="width: 100%;"
         @selection-change="handleSubjectSelectionChange"
@@ -235,30 +231,29 @@
             <span>{{ scope.row.serialNumber }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('table.subjectName')" sortable prop="subject_name" property="subjectName" min-width="120">
+        <el-table-column :label="$t('table.subjectName')" min-width="120">
           <template slot-scope="scope">
             <span>{{ scope.row.subjectName | subjectNameFilter }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('table.subject.type')" sortable prop="type" property="type" width="120">
+        <el-table-column :label="$t('table.subject.type')" width="120">
           <template slot-scope="scope">
             <el-tag type="success">{{ scope.row.type | subjectTypeFilter }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('table.subject.score')" sortable prop="score" property="score" width="120">
+        <el-table-column :label="$t('table.subject.score')" property="score" width="120">
           <template slot-scope="scope">
             <span>{{ scope.row.score }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('table.subject.level')" sortable prop="level" property="level" width="120">
+        <el-table-column :label="$t('table.subject.level')" property="level" width="120">
           <template slot-scope="scope">
             <el-rate v-model="scope.row.level" :max="4"/>
           </template>
         </el-table-column>
         <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
           <template slot-scope="scope">
-            <el-button v-if="exam_btn_subject" type="primary" size="mini" @click="handleUpdateSubject(scope.row)">{{ $t('table.edit') }}</el-button>
-            <el-button v-if="exam_btn_subject" size="mini" type="danger" @click="handleDeleteSubject(scope.row)">{{ $t('table.delete') }}</el-button>
+            <el-button v-if="exam_btn_subject" type="text" @click="handleUpdateSubject(scope.row)">{{ $t('table.edit') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -273,7 +268,9 @@
         <el-row>
           <el-col :span="12">
             <el-form-item :label="$t('table.subjectName')" prop="subjectName">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.subjectName" type="textarea"/>
+              <el-input v-model="tempSubject.subjectName">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(0)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -308,35 +305,45 @@
         <el-row v-if="tempSubject.type !== 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.content')" prop="content">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.content" type="textarea"/>
+              <el-input v-model="tempSubject.content">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(5)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionA')" prop="optionA">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionA" type="textarea"/>
+              <el-input v-model="tempSubject.optionA">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(1)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionB')" prop="optionB">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionB" type="textarea"/>
+              <el-input v-model="tempSubject.optionB">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(2)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionC')" prop="optionC">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionC" type="textarea"/>
+              <el-input v-model="tempSubject.optionC">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(3)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionD')" prop="optionD">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionD" type="textarea"/>
+              <el-input v-model="tempSubject.optionD">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(4)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -344,7 +351,9 @@
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.answer')" prop="answer">
               <!-- 非选择 -->
-              <el-input v-if="tempSubject.type !== 0" :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.answer" type="textarea"/>
+              <el-input v-if="tempSubject.type !== 0" v-model="tempSubject.answer">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(6)"></el-button>
+              </el-input>
               <!-- 选择题 -->
               <el-radio-group v-if="tempSubject.type === 0" v-model="tempSubject.answer">
                 <el-radio :label="'A'">A</el-radio>
@@ -358,7 +367,9 @@
         <el-row>
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.analysis')" prop="analysis">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.analysis" type="textarea"/>
+              <el-input v-model="tempSubject.analysis">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(7)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -396,7 +407,7 @@
     </el-dialog>
 
     <!-- 题库列表 -->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="category.dialogVisible" width="80%" top="10vh">
+    <el-dialog title="选择题目" :visible.sync="category.dialogVisible" width="80%" top="10vh">
       <el-row>
         <el-col :span="4">
           <el-card class="tree-box-card" style="margin-right: 5px;">
@@ -429,7 +440,6 @@
               v-loading="category.listLoading"
               :data="category.list"
               :default-sort="{ prop: 'id', order: 'ascending' }"
-              border
               highlight-current-row
               style="width: 100%;"
               @row-click = "handleSingleSubjectSelection"
@@ -444,17 +454,17 @@
                   <span>{{ scope.row.subjectName }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('table.subject.type')" sortable prop="type" property="type" width="200">
+              <el-table-column :label="$t('table.subject.type')">
                 <template slot-scope="scope">
                   <el-tag type="success">{{ scope.row.type | subjectTypeFilter }}</el-tag>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('table.subject.score')" sortable prop="score" property="score">
+              <el-table-column :label="$t('table.subject.score')">
                 <template slot-scope="scope">
                   <span>{{ scope.row.score }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('table.subject.level')" sortable prop="level" property="level">'
+              <el-table-column :label="$t('table.subject.level')">
                 <template slot-scope="scope">
                   <el-rate v-model="scope.row.level" :max="4"/>
                 </template>
@@ -495,25 +505,26 @@ import { getToken } from '@/utils/auth'
 import { checkMultipleSelect, exportExcel, getAttachmentPreviewUrl, isNotEmpty, notifySuccess, notifyFail, messageSuccess } from '@/utils/util'
 import { delAttachment } from '@/api/admin/attachment'
 import Tinymce from '@/components/Tinymce'
+import SpinnerLoading from '@/components/SpinnerLoading'
 
 export default {
   name: 'ExamManagement',
   directives: {
     waves
   },
-  components: { Tinymce },
+  components: { Tinymce, SpinnerLoading },
   filters: {
-    statusTypeFilter(status) {
+    statusTypeFilter (status) {
       const statusMap = {
         0: 'success',
         1: 'warning'
       }
       return statusMap[status]
     },
-    statusFilter(status) {
+    statusFilter (status) {
       return status === '0' ? '已发布' : '未发布'
     },
-    typeFilter(type) {
+    typeFilter (type) {
       const typeMap = {
         0: '正式考试',
         1: '模拟考试',
@@ -521,7 +532,7 @@ export default {
       }
       return typeMap[type]
     },
-    subjectTypeFilter(type) {
+    subjectTypeFilter (type) {
       const typeMap = {
         0: '选择题',
         1: '填空题',
@@ -530,14 +541,20 @@ export default {
       }
       return typeMap[type]
     },
-    subjectNameFilter(subjectName) {
+    subjectNameFilter (subjectName) {
       if (subjectName.length > 50) {
         return subjectName.substring(0, 50) + '...'
       }
       return subjectName
+    },
+    courseFilter (row) {
+      if (isNotEmpty(row.course) && isNotEmpty(row.course.courseName)) {
+        return row.course.courseName
+      }
+      return ''
     }
   },
-  data() {
+  data () {
     return {
       headers: {
         Authorization: 'Bearer ' + getToken()
@@ -683,12 +700,6 @@ export default {
       dialogImportVisible: false,
       // 导入题目的url
       importUrl: '/api/exam/v1/subject/import',
-      headers: {
-        Authorization: 'Bearer ' + getToken()
-      },
-      params: {
-        examinationId: ''
-      },
       uploading: false,
       percentage: 0,
       uploadingSubject: false,
@@ -717,12 +728,13 @@ export default {
         tempRadio: ''
       },
       tinymce: {
+        type: 1, // 类型 0：题目名称，1：选项A，2：选择B，3：选项C，4：选项D
         dialogTinymceVisible: false,
         tempValue: ''
       }
     }
   },
-  created() {
+  created () {
     // 加载考试列表
     this.getList()
     // 获取课程列表
@@ -751,7 +763,7 @@ export default {
   },
   methods: {
     // 加载考试列表
-    getList() {
+    getList () {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
         this.list = response.data.list
@@ -762,53 +774,53 @@ export default {
         }, 500)
       })
     },
-    handleFilter() {
+    handleFilter () {
       this.listQuery.pageNum = 1
       this.getList()
     },
-    handleSizeChange(val) {
+    handleSizeChange (val) {
       this.listQuery.limit = val
       this.getList()
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       this.listQuery.pageNum = val
       this.getList()
     },
-    handleSubjectSizeChange(val) {
+    handleSubjectSizeChange (val) {
       this.subject.listQuery.limit = val
       this.handleSubjectManagement()
     },
-    handleSubjectCurrentChange(val) {
+    handleSubjectCurrentChange (val) {
       this.subject.listQuery.pageNum = val
       this.handleSubjectManagement()
     },
-    handleModifyStatus(row, status) {
+    handleModifyStatus (row, status) {
       row.status = status
       putObj(row).then(() => {
         this.dialogFormVisible = false
         messageSuccess(this, '操作成功')
       })
     },
-    handleSelectionChange(val) {
+    handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    handleSubjectSelectionChange(val) {
+    handleSubjectSelectionChange (val) {
       this.multipleSubjectSelection = val
     },
     // 题库里选择题目
-    handleSingleSubjectSelectionChange(index, row) {
+    handleSingleSubjectSelectionChange (index, row) {
       this.category.singleSubjectSelection = row
     },
     // 点击行时选择题目
-    handleSingleSubjectSelection(row) {
+    handleSingleSubjectSelection (row) {
       this.category.tempRadio = this.category.list.indexOf(row)
     },
     // 表格变化
-    handleSingleSubjectCurrentChange(row) {
+    handleSingleSubjectCurrentChange (row) {
       this.category.singleSubjectSelection = row
     },
     // 选择题目
-    handleSelectSubject() {
+    handleSelectSubject () {
       // 隐藏弹框
       this.category.dialogVisible = false
       // 赋值给临时题目
@@ -825,24 +837,24 @@ export default {
       this.dialogSubjectFormVisible = true
     },
     // 排序事件
-    sortChange(column, prop, order) {
+    sortChange (column, prop, order) {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
       this.getList()
     },
-    sortSubjectChange(column, prop, order) {
+    sortSubjectChange (column, prop, order) {
       this.subject.listQuery.sort = column.prop
       this.subject.listQuery.order = column.order
       this.handleSubjectManagement()
     },
     // 点击分类
-    getNodeData(data) {
+    getNodeData (data) {
       // 获取分类ID
       this.category.listQuery.categoryId = data.id
       // 获取题目信息
       this.handleSubjectBankManagement()
     },
-    resetTemp() {
+    resetTemp () {
       this.temp = {
         id: '',
         examinationName: '',
@@ -863,7 +875,7 @@ export default {
         remark: ''
       }
     },
-    handleCreate() {
+    handleCreate () {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -871,7 +883,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    createData() {
+    createData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           addObj(this.temp).then(() => {
@@ -883,7 +895,7 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
+    handleUpdate (row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.status = parseInt(this.temp.status)
       this.temp.type = parseInt(this.temp.type)
@@ -899,7 +911,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    updateData() {
+    updateData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
@@ -919,7 +931,7 @@ export default {
       })
     },
     // 删除
-    handleDelete(row) {
+    handleDelete (row) {
       this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -935,7 +947,7 @@ export default {
       }).catch(() => {})
     },
     // 批量删除
-    handleDeletes() {
+    handleDeletes () {
       if (checkMultipleSelect(this.multipleSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
@@ -954,7 +966,7 @@ export default {
       }
     },
     // 选择课程
-    selectCourse() {
+    selectCourse () {
       this.course.listLoading = true
       fetchCourseList(this.course.listQuery).then(response => {
         this.course.list = response.data.list
@@ -964,13 +976,13 @@ export default {
       this.dialogCourseVisible = true
     },
     // 双击选择课程
-    selectedCourse(row) {
+    selectedCourse (row) {
       this.temp.course.id = row.id
       this.temp.course.courseName = row.courseName
       this.dialogCourseVisible = false
     },
     // 加载题目
-    handleSubjectManagement(row) {
+    handleSubjectManagement (row) {
       this.subject.listLoading = true
       // 保存当前题目列表的考试ID
       if (row !== undefined) {
@@ -988,12 +1000,14 @@ export default {
         }
         this.subject.list = response.data.list
         this.subject.total = response.data.total
-        this.subject.listLoading = false
+        setTimeout(() => {
+          this.subject.listLoading = false
+        }, 500)
       })
       this.dialogSubjectVisible = true
     },
     // 加载题库列表
-    handleSubjectBankManagement() {
+    handleSubjectBankManagement () {
       this.category.listLoading = true
       fetchSubjectBankList(this.category.listQuery).then(response => {
         if (response.data.list.length > 0) {
@@ -1008,12 +1022,12 @@ export default {
         this.category.listLoading = false
       })
     },
-    handleFilterSubject() {
+    handleFilterSubject () {
       this.subject.listQuery.pageNum = 1
       this.handleSubjectManagement()
     },
     // 新建题目
-    handleCreateSubject() {
+    handleCreateSubject () {
       this.resetTempSubject()
       this.dialogStatus = 'create'
       this.dialogSubjectFormVisible = true
@@ -1022,7 +1036,7 @@ export default {
       })
     },
     // 从题库新增
-    handleCreateSubjectFromSubjectBank() {
+    handleCreateSubjectFromSubjectBank () {
       // 加载分类树
       fetchTree(this.category.listQuery).then(response => {
         this.category.treeData = response.data
@@ -1030,7 +1044,7 @@ export default {
       this.category.dialogVisible = true
       // 加载题目列表
     },
-    resetTempSubject(serialNumber, score) {
+    resetTempSubject (serialNumber, score) {
       this.tempSubject = {
         id: '',
         examinationId: '',
@@ -1060,7 +1074,7 @@ export default {
       }
     },
     // 修改题目
-    handleUpdateSubject(row) {
+    handleUpdateSubject (row) {
       this.tempSubject = Object.assign({}, row) // copy obj
       this.tempSubject.status = parseInt(status)
       this.tempSubject.type = parseInt(row.type)
@@ -1073,7 +1087,7 @@ export default {
       })
     },
     // 删除题目
-    handleDeleteSubject(row) {
+    handleDeleteSubject (row) {
       this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -1087,7 +1101,7 @@ export default {
       }).catch(() => {})
     },
     // 保存题目
-    createSubjectData() {
+    createSubjectData () {
       this.$refs['dataSubjectForm'].validate((valid) => {
         if (valid) {
           // 绑定考试ID
@@ -1102,7 +1116,7 @@ export default {
       })
     },
     // 更新题目
-    updateSubjectData() {
+    updateSubjectData () {
       this.$refs['dataSubjectForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.tempSubject)
@@ -1115,7 +1129,7 @@ export default {
       })
     },
     // 更新并添加题目
-    updateAndAddSubjectData() {
+    updateAndAddSubjectData () {
       this.$refs['dataSubjectForm'].validate((valid) => {
         if (valid) {
           // 绑定考试ID
@@ -1148,11 +1162,11 @@ export default {
       })
     },
     // 切换题目类型
-    changeSubjectType(value) {
+    changeSubjectType (value) {
       console.log(value)
     },
     // 发布考试
-    handlePublic(row, status) {
+    handlePublic (row, status) {
       const tempData = Object.assign({}, row)
       tempData.status = status
       putObj(tempData).then(() => {
@@ -1161,7 +1175,7 @@ export default {
       })
     },
     // 批量删除
-    handleDeletesSubject() {
+    handleDeletesSubject () {
       if (checkMultipleSelect(this.multipleSubjectSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSubjectSelection.length; i++) {
@@ -1180,7 +1194,7 @@ export default {
       }
     },
     // 导出
-    handleExportSubject() {
+    handleExportSubject () {
       // 没选择题目，导出所有
       if (this.multipleSubjectSelection.length === 0) {
         this.$confirm('是否导出所有题目?', '提示', {
@@ -1212,11 +1226,11 @@ export default {
       }
     },
     // 导入
-    handleImportSubject() {
+    handleImportSubject () {
       this.dialogImportVisible = true
     },
     // 上传前
-    beforeUploadSubjectUpload(file) {
+    beforeUploadSubjectUpload (file) {
       const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       const isLt10M = file.size / 1024 / 1024 < 10
       if (!isExcel) {
@@ -1227,19 +1241,19 @@ export default {
       }
       return isExcel && isLt10M
     },
-    handleUploadSubjectProgress(event, file, fileList) {
+    handleUploadSubjectProgress (event, file, fileList) {
       this.uploadingSubject = true
       this.percentageSubject = parseInt(file.percentage.toFixed(0))
     },
     // 上传成功
-    handleUploadSubjectSuccess() {
+    handleUploadSubjectSuccess () {
       this.dialogImportVisible = false
       this.handleSubjectManagement()
       notifySuccess(this, '导入成功')
       this.uploadingSubject = false
     },
     // 图片上传前
-    beforeAvatarUpload(file) {
+    beforeAvatarUpload (file) {
       const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
       const isLt2M = file.size / 1024 / 1024 < 2
 
@@ -1252,7 +1266,7 @@ export default {
       return isJPG && isLt2M
     },
     // 上传成功
-    handleAvatarSuccess(res, file) {
+    handleAvatarSuccess (res, file) {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           if (isNotEmpty(this.temp.avatar)) {
@@ -1284,17 +1298,56 @@ export default {
         }
       })
     },
-    getExaminationAvatar(avatar) {
+    getExaminationAvatar (avatar) {
       return getAttachmentPreviewUrl(this.sysConfig, avatar)
     },
-    // 输入
-    handleInputTinymce(value) {
-      this.tinymce.tempValue = value
+    // 富文本输入
+    tinymceSubmitName (type) {
+      this.tinymce.type = type
+      // 初始化富文本的内容
+      let content = ''
+      if (type === 0) {
+        content = this.tempSubject.subjectName
+      } else if (type === 1) {
+        content = this.tempSubject.optionA
+      } else if (type === 2) {
+        content = this.tempSubject.optionB
+      } else if (type === 3) {
+        content = this.tempSubject.optionC
+      } else if (type === 4) {
+        content = this.tempSubject.optionD
+      } else if (type === 5) {
+        content = this.tempSubject.content
+      } else if (type === 6) {
+        content = this.tempSubject.answer
+      } else if (type === 7) {
+        content = this.tempSubject.analysis
+      }
       this.tinymce.dialogTinymceVisible = true
+      this.$refs.editor.setContent(content)
     },
     // 富文本保存
-    updateTinymceData() {
-      console.log(this.$refs.editor.getContent())
+    updateTinymceData () {
+      const content = this.$refs.editor.getContent()
+      // 编辑类型
+      const type = this.tinymce.type
+      if (type === 0) {
+        this.tempSubject.subjectName = content
+      } else if (type === 1) {
+        this.tempSubject.optionA = content
+      } else if (type === 2) {
+        this.tempSubject.optionB = content
+      } else if (type === 3) {
+        this.tempSubject.optionC = content
+      } else if (type === 4) {
+        this.tempSubject.optionD = content
+      } else if (type === 5) {
+        this.tempSubject.content = content
+      } else if (type === 6) {
+        this.tempSubject.answer = content
+      } else if (type === 7) {
+        this.tempSubject.analysis = content
+      }
       this.tinymce.dialogTinymceVisible = false
     }
   }
@@ -1317,5 +1370,11 @@ export default {
   }
   .editor-content{
     margin-top: 20px;
+  }
+  .subjectBankList {
+    margin: 24px 24px 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
 </style>

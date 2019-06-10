@@ -28,7 +28,7 @@
           <svg-icon icon-class="chart" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">及格率</div>
+          <div class="card-panel-text">参加人数</div>
           <count-to :start-val="0" :end-val="9280" :duration="2400" class="card-panel-num"/>
         </div>
       </div>
@@ -39,7 +39,7 @@
           <svg-icon icon-class="tab" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
-          <div class="card-panel-text">测试</div>
+          <div class="card-panel-text">及格率</div>
           <count-to :start-val="0" :end-val="13600" :duration="2600" class="card-panel-num"/>
         </div>
       </div>
@@ -50,27 +50,27 @@
 <script>
 import CountTo from 'vue-count-to'
 import { getDashboard } from '@/api/admin/sys'
-import { notifyFail, isNotEmpty } from '@/utils/util'
+import { isNotEmpty } from '@/utils/util'
 
 export default {
   components: {
     CountTo
   },
-  data() {
+  data () {
     return {
       onlineUserNumber: 0,
       examinationNumber: 0
     }
   },
-  created() {
+  created () {
     // 获取首页数据
     this.getDashboardData()
   },
   methods: {
-    handleSetLineChartData(type) {
+    handleSetLineChartData (type) {
       this.$emit('handleSetLineChartData', type)
     },
-    getDashboardData() {
+    getDashboardData () {
       getDashboard().then(response => {
         if (isNotEmpty(response.data) && isNotEmpty(response.data.data)) {
           const data = response.data.data

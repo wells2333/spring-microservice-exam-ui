@@ -145,7 +145,7 @@ export default {
   name: 'MenuManagement',
   components: {},
   filters: {
-    typeFilter(type) {
+    typeFilter (type) {
       const typeMap = {
         0: '菜单',
         1: '按钮'
@@ -153,7 +153,7 @@ export default {
       return typeMap[type]
     }
   },
-  data() {
+  data () {
     return {
       list: null,
       total: null,
@@ -213,7 +213,7 @@ export default {
       percentage: 0
     }
   },
-  created() {
+  created () {
     this.getList()
     this.menu_btn_add = this.permissions['sys:menu:add']
     this.menu_btn_edit = this.permissions['sys:menu:edit']
@@ -228,7 +228,7 @@ export default {
     ])
   },
   methods: {
-    getList() {
+    getList () {
       fetchTree(this.listQuery).then(response => {
         this.treeData = response.data
         // 加载后默认选中第一个菜单
@@ -239,11 +239,11 @@ export default {
         }
       })
     },
-    filterNode(value, data) {
+    filterNode (value, data) {
       if (!value) return true
       return data.label.indexOf(value) !== -1
     },
-    nodeExpand(data) {
+    nodeExpand (data) {
       const aChildren = data.children
       if (aChildren.length > 0) {
         this.oExpandedKey[data.id] = true
@@ -251,7 +251,7 @@ export default {
       }
       this.setExpandedKeys()
     },
-    nodeCollapse(data) {
+    nodeCollapse (data) {
       this.oExpandedKey[data.id] = false
       // 如果有子节点
       this.treeRecursion(this.oTreeNodeChildren[data.id], (oNode) => {
@@ -259,7 +259,7 @@ export default {
       })
       this.setExpandedKeys()
     },
-    setExpandedKeys() {
+    setExpandedKeys () {
       const oTemp = this.oExpandedKey
       this.aExpandedKeys = []
       for (const sKey in oTemp) {
@@ -268,7 +268,7 @@ export default {
         }
       }
     },
-    treeRecursion(aChildren, fnCallback) {
+    treeRecursion (aChildren, fnCallback) {
       if (aChildren) {
         for (let i = 0; i < aChildren.length; ++i) {
           const oNode = aChildren[i]
@@ -277,7 +277,7 @@ export default {
         }
       }
     },
-    getNodeData(data) {
+    getNodeData (data) {
       this.formStatus = 'update'
       getObj(data.id).then(response => {
         this.form = response.data
@@ -285,22 +285,22 @@ export default {
       this.currentId = data.id
       this.showElement = true
     },
-    handlerEdit() {
+    handlerEdit () {
       if (this.form.id) {
         this.formStatus = 'update'
       }
     },
-    handlerAddSuper() {
+    handlerAddSuper () {
       this.resetForm()
       this.form.parentId = -1
       this.form.component = 'Layout'
       this.formStatus = 'create'
     },
-    handlerAdd() {
+    handlerAdd () {
       this.resetForm()
       this.formStatus = 'create'
     },
-    handleDelete() {
+    handleDelete () {
       if (this.currentId === '') {
         this.$message({
           message: '请选择要删除的记录',
@@ -321,7 +321,7 @@ export default {
         })
       }).catch(() => {})
     },
-    create() {
+    create () {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           if (this.form.id) {
@@ -339,10 +339,10 @@ export default {
         }
       })
     },
-    onCancel() {
+    onCancel () {
       this.formStatus = ''
     },
-    resetForm() {
+    resetForm () {
       this.form = {
         permission: undefined,
         name: undefined,
@@ -358,15 +358,15 @@ export default {
       }
     },
     // 导入
-    handleImport() {
+    handleImport () {
       this.dialogImportVisible = true
     },
     // 显示导出弹窗
-    handleExport() {
+    handleExport () {
       this.dialogExportVisible = true
     },
     // 导出
-    handleExportMenu() {
+    handleExportMenu () {
       // 获取选中节点
       const keys = this.$refs.menuTree.getCheckedKeys(true).concat(this.$refs.menuTree.getHalfCheckedKeys())
       let menus = ''
@@ -398,7 +398,7 @@ export default {
       }
     },
     // 上传前
-    beforeMenuUpload(file) {
+    beforeMenuUpload (file) {
       const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       const isLt10M = file.size / 1024 / 1024 < 10
       if (!isExcel) {
@@ -409,12 +409,12 @@ export default {
       }
       return isExcel && isLt10M
     },
-    handleUploadProgress(event, file, fileList) {
+    handleUploadProgress (event, file, fileList) {
       this.uploading = true
       this.percentage = parseInt(file.percentage.toFixed(0))
     },
     // 上传成功
-    handleUploadMenuSuccess() {
+    handleUploadMenuSuccess () {
       notifySuccess(this, '导入成功')
       this.dialogImportVisible = false
       this.getList()

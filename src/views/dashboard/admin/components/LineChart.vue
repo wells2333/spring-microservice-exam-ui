@@ -3,9 +3,9 @@
 </template>
 
 <script>
-import echarts from 'echarts'
-require('echarts/theme/macarons') // echarts theme
+import echarts from 'echarts' // echarts theme
 import { debounce } from '@/utils'
+require('echarts/theme/macarons')
 
 export default {
   props: {
@@ -30,7 +30,7 @@ export default {
       required: true
     }
   },
-  data() {
+  data () {
     return {
       chart: null
     }
@@ -38,12 +38,12 @@ export default {
   watch: {
     chartData: {
       deep: true,
-      handler(val) {
+      handler (val) {
         this.setOptions(val)
       }
     }
   },
-  mounted() {
+  mounted () {
     this.initChart()
     if (this.autoResize) {
       this.__resizeHandler = debounce(() => {
@@ -58,7 +58,7 @@ export default {
     const sidebarElm = document.getElementsByClassName('sidebar-container')[0]
     sidebarElm.addEventListener('transitionend', this.sidebarResizeHandler)
   },
-  beforeDestroy() {
+  beforeDestroy () {
     if (!this.chart) {
       return
     }
@@ -73,15 +73,15 @@ export default {
     this.chart = null
   },
   methods: {
-    sidebarResizeHandler(e) {
+    sidebarResizeHandler (e) {
       if (e.propertyName === 'width') {
         this.__resizeHandler()
       }
     },
-    setOptions({ expectedData, actualData } = {}) {
+    setOptions ({ expectedData, actualData } = {}) {
       this.chart.setOption({
         xAxis: {
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
           boundaryGap: false,
           axisTick: {
             show: false
@@ -107,10 +107,11 @@ export default {
           }
         },
         legend: {
-          data: ['expected', 'actual']
+          data: ['预期', '实际']
         },
         series: [{
-          name: 'expected', itemStyle: {
+          name: '预期',
+          itemStyle: {
             normal: {
               color: '#FF005A',
               lineStyle: {
@@ -126,7 +127,7 @@ export default {
           animationEasing: 'cubicInOut'
         },
         {
-          name: 'actual',
+          name: '实际',
           smooth: true,
           type: 'line',
           itemStyle: {
@@ -147,7 +148,7 @@ export default {
         }]
       })
     },
-    initChart() {
+    initChart () {
       this.chart = echarts.init(this.$el, 'macarons')
       this.setOptions(this.chartData)
     }

@@ -9,7 +9,7 @@ Vue.use(VueRouter)
 export default new VueRouter({
   // mode: 'history',
   strict: process.env.NODE_ENV !== 'production',
-  scrollBehavior(to, from, savedPosition) {
+  scrollBehavior (to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition
     } else {

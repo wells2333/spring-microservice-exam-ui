@@ -15,7 +15,7 @@
 export default {
   name: 'SocialSignin',
   methods: {
-    wechatHandleClick(thirdpart) {
+    wechatHandleClick (thirdpart) {
       alert('ok')
       // this.$store.commit('SET_AUTH_TYPE', thirdpart)
       // const appid = 'xxxxx'
@@ -23,7 +23,7 @@ export default {
       // const url = 'https://open.weixin.qq.com/connect/qrconnect?appid=' + appid + '&redirect_uri=' + redirect_uri + '&response_type=code&scope=snsapi_login#wechat_redirect'
       // openWindow(url, thirdpart, 540, 540)
     },
-    tencentHandleClick(thirdpart) {
+    tencentHandleClick (thirdpart) {
       alert('ok')
       // this.$store.commit('SET_AUTH_TYPE', thirdpart)
       // const client_id = 'xxxxx'

@@ -6,31 +6,29 @@
       <el-button class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
       <el-button class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
     </div>
-
+    <spinner-loading v-if="listLoading"/>
     <el-table
-      v-loading="listLoading"
       ref="multipleTable"
       :key="tableKey"
       :data="list"
       :default-sort="{ prop: 'id', order: 'descending' }"
-      border
       highlight-current-row
       style="width: 100%;"
       @row-dblclick="handleUpdate"
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.knowledge.knowledgeName')" sortable prop="knowledge_name" min-width="90" align="center">
+      <el-table-column :label="$t('table.knowledge.knowledgeName')" sortable prop="knowledge_name" min-width="90">
         <template slot-scope="scope">
           <span>{{ scope.row.knowledgeName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.knowledge.knowledgeDesc')" sortable prop="knowledge_desc" min-width="90" align="center">
+      <el-table-column :label="$t('table.knowledge.knowledgeDesc')" min-width="90">
         <template slot-scope="scope">
           <span>{{ scope.row.knowledgeDesc }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.knowledge.status')" sortable prop="status" min-width="90" align="center">
+      <el-table-column :label="$t('table.knowledge.status')" min-width="90">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
@@ -39,9 +37,7 @@
         <template slot-scope="scope">
           <el-button v-if="scope.row.status == 1" type="warning" size="mini" @click="handlePublic(scope.row, 0)">{{ $t('table.public') }}</el-button>
           <el-button v-if="scope.row.status == 0" type="success" size="mini" @click="handlePublic(scope.row, 1)">{{ $t('table.retrieve') }}</el-button>
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
-          </el-button>
+          <el-button type="text" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -101,25 +97,29 @@ import { mapGetters, mapState } from 'vuex'
 import { checkMultipleSelect, notifySuccess, notifyFail, messageSuccess } from '@/utils/util'
 import { getToken } from '@/utils/auth' // getToken from cookie
 import { getObj, delAttachment } from '@/api/admin/attachment'
+import SpinnerLoading from '@/components/SpinnerLoading'
 
 export default {
   name: 'KnowledgeManagement',
+  components: {
+    SpinnerLoading
+  },
   directives: {
     waves
   },
   filters: {
-    statusTypeFilter(status) {
+    statusTypeFilter (status) {
       const statusMap = {
         0: 'success',
         1: 'warning'
       }
       return statusMap[status]
     },
-    statusFilter(status) {
-      return status == '0' ? '启用' : '禁用'
+    statusFilter (status) {
+      return status === '0' ? '启用' : '禁用'
     }
   },
-  data() {
+  data () {
     return {
       tableKey: 0,
       list: null,
@@ -164,7 +164,7 @@ export default {
       fileList: []
     }
   },
-  created() {
+  created () {
     this.getList()
   },
   computed: {
@@ -177,7 +177,7 @@ export default {
     })
   },
   methods: {
-    getList() {
+    getList () {
       this.listLoading = true
       fetchKnowledgeList(this.listQuery).then(response => {
         this.list = response.data.list
@@ -187,38 +187,38 @@ export default {
         }, 500)
       })
     },
-    handleFilter() {
+    handleFilter () {
       this.listQuery.pageNum = 1
       this.getList()
     },
-    handleSizeChange(val) {
+    handleSizeChange (val) {
       this.listQuery.limit = val
       this.getList()
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       this.listQuery.pageNum = val
       this.getList()
     },
-    handleModifyStatus(row, status) {
+    handleModifyStatus (row, status) {
       row.status = status
       putObj(row).then(() => {
         this.dialogFormVisible = false
         messageSuccess(this, '操作成功')
       })
     },
-    handleSelectionChange(val) {
+    handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    sortChange(column, prop, order) {
+    sortChange (column, prop, order) {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
       this.getList()
     },
     // 点击选中
-    handleRowClick(row) {
+    handleRowClick (row) {
       this.$refs.multipleTable.toggleRowSelection(row, true)
     },
-    resetTemp() {
+    resetTemp () {
       this.temp = {
         id: '',
         knowledgeName: '',
@@ -227,7 +227,7 @@ export default {
         status: '0'
       }
     },
-    handleCreate() {
+    handleCreate () {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -235,7 +235,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    createData() {
+    createData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           addObj(this.temp).then(() => {
@@ -247,7 +247,7 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
+    handleUpdate (row) {
       this.temp = Object.assign({}, row)
       this.temp.status = parseInt(this.temp.status)
       this.dialogStatus = 'update'
@@ -258,7 +258,7 @@ export default {
       // 获取附件列表
       this.getFileList(this.temp.attachmentId)
     },
-    updateData() {
+    updateData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
@@ -271,7 +271,7 @@ export default {
       })
     },
     // 删除
-    handleDelete(row) {
+    handleDelete (row) {
       this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -287,7 +287,7 @@ export default {
       }).catch(() => {})
     },
     // 批量删除
-    handleDeletes() {
+    handleDeletes () {
       if (checkMultipleSelect(this.multipleSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
@@ -306,14 +306,14 @@ export default {
         }).catch(() => {})
       }
     },
-    handleUploadSuccess(response) {
+    handleUploadSuccess (response) {
       this.uploading = false
       // 关联知识
       this.temp.attachmentId = response.data.id
       this.updateData()
     },
     // 查询附件列表
-    getFileList(attachmentId) {
+    getFileList (attachmentId) {
       if (attachmentId !== '') {
         getObj(attachmentId).then(response => {
           const data = response.data.data
@@ -329,11 +329,11 @@ export default {
       }
     },
     // 限制
-    handleExceed(files, fileList) {
+    handleExceed (files, fileList) {
       this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`)
     },
     // 删除附件
-    handleRemove(file, fileList) {
+    handleRemove (file, fileList) {
       delAttachment(this.temp.attachmentId).then(() => {
         notifySuccess(this, '删除成功')
       }).catch(() => {
@@ -341,7 +341,7 @@ export default {
       })
     },
     // 启用知识
-    handlePublic(row, status) {
+    handlePublic (row, status) {
       const tempData = Object.assign({}, row)
       tempData.status = status
       putObj(tempData).then(() => {

@@ -7,18 +7,18 @@
 </template>
 
 <script>
-  export default {
-    props: {
-      className: {
-        type: String,
-        default: ''
-      },
-      text: {
-        type: String,
-        default: 'vue-element-admin'
-      }
+export default {
+  props: {
+    className: {
+      type: String,
+      default: ''
+    },
+    text: {
+      type: String,
+      default: 'vue-element-admin'
     }
   }
+}
 </script>
 
 <style>

@@ -3,6 +3,9 @@
     <div class="login-wrap animated flipInY">
       <h3>{{ $t('login.title') }}</h3>
       <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
+        <el-form-item prop="tenantCode">
+          <el-input :placeholder="$t('login.tenantCode')" v-model="loginForm.tenantCode" name="tenantCode" type="text" auto-complete="on"/>
+        </el-form-item>
         <el-form-item prop="username">
           <el-input :placeholder="$t('login.username')" v-model="loginForm.username" name="username" type="text" auto-complete="on"/>
         </el-form-item>
@@ -63,18 +66,10 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'Login',
   components: { LangSelect, SocialSign },
-  data() {
-    const validateCode = (rule, value, callback) => {
-      if (this.code.value !== value) {
-        this.loginForm.code = ''
-        this.refreshCode()
-        callback(new Error('请输入正确的验证码'))
-      } else {
-        callback()
-      }
-    }
+  data () {
     return {
       loginForm: {
+        tenantCode: '',
         username: 'admin',
         password: '123456',
         code: '',
@@ -88,6 +83,7 @@ export default {
         type: 'image'
       },
       loginRules: {
+        tenantCode: [{ required: true, trigger: 'blur', message: '请输入单位ID' }],
         username: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
         password: [
           { required: true, trigger: 'blur', message: '请输入密码' },
@@ -105,37 +101,37 @@ export default {
   },
   watch: {
     $route: {
-      handler: function(route) {
+      handler: function (route) {
         this.redirect = route.query && route.query.redirect
       },
       immediate: true
     }
   },
-  created() {
+  created () {
     this.refreshCode()
   },
   computed: {
     ...mapGetters(['tagWel'])
   },
-  destroyed() {
+  destroyed () {
 
   },
   methods: {
-    refreshCode() {
+    refreshCode () {
       this.loginForm.code = ''
       this.loginForm.randomStr = randomLenNum(this.code.len, true)
       this.code.type === 'text'
         ? (this.code.value = randomLenNum(this.code.len))
         : (this.code.src = `/api/user/v1/code/${this.loginForm.randomStr}`)
     },
-    showPwd() {
+    showPwd () {
       if (this.passwordType === 'password') {
         this.passwordType = ''
       } else {
         this.passwordType = 'password'
       }
     },
-    handleLogin() {
+    handleLogin () {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
@@ -153,7 +149,7 @@ export default {
         }
       })
     },
-    openMsg() {
+    openMsg () {
       // 使用了国际化
       this.$message.warning(this.$t('login.info'))
     }
@@ -170,7 +166,7 @@ export default {
     justify-content: center;
     align-items: center;
     background: url('../../../static/img/login_bg.jpg') -20% 10%;
-    background-size: contain;
+    background-size: cover;
     #particles-js {
       position: absolute;
       top: 0;
@@ -185,7 +181,7 @@ export default {
     padding: 20px;
     z-index: 3;
     margin-right: -37%;
-    background: rgba(216,220,229,0.5);
+    background: rgba(149, 159, 181, 0.5);
     .el-form-item {
       margin-bottom: 25px !important;
     }

@@ -12,50 +12,42 @@
       :key="tableKey"
       :data="list"
       :default-sort="{ prop: 'id', order: 'descending' }"
-      border
       highlight-current-row
       style="width: 100%;"
       @cell-dblclick="handleUpdate"
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.roleCode')" sortable prop="role_code" min-width="90" align="center">
+      <el-table-column :label="$t('table.roleCode')" sortable prop="role_code">
         <template slot-scope="scope">
           <span>{{ scope.row.roleCode }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.roleName')" sortable prop="role_name" min-width="90" align="center">
+      <el-table-column :label="$t('table.roleName')">
         <template slot-scope="scope">
           <span>{{ scope.row.roleName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.roleDesc')" min-width="90" align="center">
+      <el-table-column :label="$t('table.roleDesc')">
         <template slot-scope="scope">
           <span>{{ scope.row.roleDesc }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.ownDept')" min-width="90" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.deptName }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.isDefault')" align="center" width="120px">
+      <el-table-column :label="$t('table.isDefault')">
         <template slot-scope="scope">
           {{ scope.row.isDefault | isDefaultFilter }}
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.status')" align="center" width="120px">
+      <el-table-column :label="$t('table.status')" width="80">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
+      <el-table-column :label="$t('table.actions')" class-name="status-col">
         <template slot-scope="scope">
-          <el-button v-if="role_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="role_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
-          </el-button>
-          <el-button v-if="role_btn_auth" size="mini" @click="handlePermission(scope.row)">{{ $t('table.permission') }}
-          </el-button>
+          <el-button v-if="role_btn_edit" type="text" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="role_btn_del" type="text" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
+          <el-button v-if="role_btn_auth" type="text" @click="handlePermission(scope.row)">{{ $t('table.permission') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -64,7 +56,7 @@
       <el-pagination v-show="total>0" :current-page="listQuery.pageNum" :page-sizes="[10,20,30, 50]" :page-size="listQuery.pageSize" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
     </div>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="60%" top="10vh">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="40%" top="10vh">
       <el-form ref="dataForm" :rules="rules" :model="temp" :label-position="labelPosition" label-width="100px">
         <el-form-item :label="$t('table.roleCode')" prop="roleCode">
           <el-input v-model="temp.roleCode" :readonly="temp.readonly"/>
@@ -87,10 +79,6 @@
             <el-radio :label="1">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item :label="$t('table.ownDept')" prop="deptName">
-          <el-input v-model="temp.deptName" @focus="handleSelectDept"/>
-          <el-input v-model="temp.deptId" type="hidden"/>
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
@@ -99,19 +87,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogDeptVisible">
-      <el-tree
-        :data="treeDeptData"
-        :props="defaultProps"
-        class="filter-tree"
-        node-key="id"
-        default-expand-all
-        highlight-current
-        @node-click="getNodeData"
-      />
-    </el-dialog>
-
-    <el-dialog :visible.sync="dialogPermissionVisible" title="角色权限" top="10vh">
+    <el-dialog :visible.sync="dialogPermissionVisible" title="角色权限" width="40%" top="10vh">
       <el-tree
         ref="menuTree"
         :data="treePermissionData"
@@ -120,11 +96,10 @@
         show-checkbox
         class="filter-tree"
         node-key="id"
-        default-expand-all
         highlight-current
-        @node-click="getNodeData"
       />
       <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogPermissionVisible = false">{{ $t('table.cancel') }}</el-button>
         <el-button v-if="role_btn_edit" type="primary" @click="savePermission(id, roleCode)">保存</el-button>
       </div>
     </el-dialog>
@@ -133,7 +108,7 @@
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj, fetchDeptTree, fetchRoleTree, permissionUpdate, delAllObj } from '@/api/admin/role'
+import { fetchList, addObj, putObj, delObj, fetchRoleTree, permissionUpdate, delAllObj } from '@/api/admin/role'
 import { fetchTree } from '@/api/admin/menu'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
@@ -145,21 +120,21 @@ export default {
     waves
   },
   filters: {
-    statusTypeFilter(status) {
+    statusTypeFilter (status) {
       const statusMap = {
         0: 'success',
         1: 'danger'
       }
       return statusMap[status]
     },
-    statusFilter(status) {
+    statusFilter (status) {
       return status === '0' ? '启用' : '禁用'
     },
-    isDefaultFilter(status) {
+    isDefaultFilter (status) {
       return status === '1' ? '是' : '否'
     }
   },
-  data() {
+  data () {
     return {
       tableKey: 0,
       list: null,
@@ -178,17 +153,13 @@ export default {
         roleCode: '',
         roleDesc: '',
         status: 0,
-        deptId: '',
-        deptName: '',
         isDefault: '0'
       },
       treeData: [],
-      treeDeptData: [],
       treePermissionData: [],
       checkedKeys: [],
       multipleSelection: [],
       dialogFormVisible: false,
-      dialogDeptVisible: false,
       dialogPermissionVisible: false,
       dialogStatus: '',
       textMap: {
@@ -201,10 +172,6 @@ export default {
         roleCode: [{ required: true, message: '请输入角色代码', trigger: 'change' }]
       },
       downloadLoading: false,
-      defaultProps: {
-        children: 'children',
-        label: 'deptName'
-      },
       permissionProps: {
         children: 'children',
         lable: 'name'
@@ -216,7 +183,7 @@ export default {
       role_btn_auth: false
     }
   },
-  created() {
+  created () {
     this.getList()
     this.role_btn_add = this.permissions['sys:role:add']
     this.role_btn_edit = this.permissions['sys:role:edit']
@@ -230,7 +197,7 @@ export default {
     ])
   },
   methods: {
-    getList() {
+    getList () {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
         this.list = response.data.list
@@ -241,46 +208,44 @@ export default {
         }, 500)
       })
     },
-    handleFilter() {
+    handleFilter () {
       this.listQuery.pageNum = 1
       this.getList()
     },
-    handleSizeChange(val) {
+    handleSizeChange (val) {
       this.listQuery.limit = val
       this.getList()
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       this.listQuery.pageNum = val
       this.getList()
     },
-    handleModifyStatus(row, status) {
+    handleModifyStatus (row, status) {
       row.status = status
       putObj(row).then(() => {
         this.dialogFormVisible = false
         messageSuccess(this, '操作成功')
       })
     },
-    handleSelectionChange(val) {
+    handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    sortChange(column, prop, order) {
+    sortChange (column, prop, order) {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
       this.getList()
     },
-    resetTemp() {
+    resetTemp () {
       this.temp = {
         id: '',
         roleName: '',
         roleCode: '',
         roleDesc: '',
         status: 0,
-        deptId: '',
-        deptName: '',
-        isDefault: '0'
+        isDefault: 0
       }
     },
-    handleCreate() {
+    handleCreate () {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -288,7 +253,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    createData() {
+    createData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           addObj(this.temp).then(() => {
@@ -300,7 +265,7 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
+    handleUpdate (row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.born = new Date(parseInt(this.temp.born))
       this.temp.sex = parseInt(this.temp.sex)
@@ -313,7 +278,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    updateData() {
+    updateData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
@@ -333,7 +298,7 @@ export default {
       })
     },
     // 删除
-    handleDelete(row) {
+    handleDelete (row) {
       this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -349,8 +314,8 @@ export default {
       }).catch(() => {})
     },
     // 批量删除
-    handleDeletes() {
-      if (checkMultipleSelect(this.multipleSelection, this )) {
+    handleDeletes () {
+      if (checkMultipleSelect(this.multipleSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids += this.multipleSelection[i].id + ','
@@ -368,20 +333,8 @@ export default {
         }).catch(() => {})
       }
     },
-    // 所属部门
-    handleSelectDept() {
-      fetchDeptTree().then(response => {
-        this.treeDeptData = response.data
-        this.dialogDeptVisible = true
-      })
-    },
-    getNodeData(data) {
-      this.dialogDeptVisible = false
-      this.temp.deptId = data.id
-      this.temp.deptName = data.deptName
-    },
     // 分配权限
-    handlePermission(row) {
+    handlePermission (row) {
       fetchRoleTree(row.roleCode)
         .then(response => {
           this.checkedKeys = response.data
@@ -395,7 +348,8 @@ export default {
         })
     },
     // 保存权限
-    savePermission(id, roleCode) {
+    savePermission (id, roleCode) {
+      debugger
       const keys = this.$refs.menuTree.getCheckedKeys()
       let menus = ''
       if (keys.length > 0) {

@@ -6,45 +6,41 @@
       <el-button v-if="course_btn_add" class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
       <el-button v-if="course_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
     </div>
-
+    <spinner-loading v-if="listLoading"/>
     <el-table
-      v-loading="listLoading"
       ref="multipleTable"
       :key="tableKey"
       :data="list"
       :default-sort="{ prop: 'id', order: 'descending' }"
-      border
       highlight-current-row
       style="width: 100%;"
       @row-dblclick="handleUpdate"
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.courseName')" sortable prop="course_name" min-width="90" align="center">
+      <el-table-column :label="$t('table.courseName')" sortable prop="course_name">
         <template slot-scope="scope">
           <span>{{ scope.row.courseName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.college')" sortable prop="college" min-width="90" align="center">
+      <el-table-column :label="$t('table.college')" sortable prop="college">
         <template slot-scope="scope">
           <span>{{ scope.row.college }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.major')" sortable prop="major" min-width="90" align="center">
+      <el-table-column :label="$t('table.major')" sortable prop="major">
         <template slot-scope="scope">
           <span>{{ scope.row.major }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.teacher')" sortable prop="teacher" min-width="90" align="center">
+      <el-table-column :label="$t('table.teacher')" sortable prop="teacher">
         <template slot-scope="scope">
           <span>{{ scope.row.teacher }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
+      <el-table-column :label="$t('table.actions')" class-name="status-col">
         <template slot-scope="scope">
-          <el-button v-if="course_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="course_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
-          </el-button>
+          <el-button v-if="course_btn_edit" type="text" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -101,13 +97,17 @@ import { fetchCourseList, addObj, putObj, delObj, delAllObj } from '@/api/exam/c
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import { checkMultipleSelect, notifySuccess, messageSuccess } from '@/utils/util'
+import SpinnerLoading from '@/components/SpinnerLoading'
 
 export default {
   name: 'CourseManagement',
+  components: {
+    SpinnerLoading
+  },
   directives: {
     waves
   },
-  data() {
+  data () {
     return {
       tableKey: 0,
       list: null,
@@ -147,7 +147,7 @@ export default {
       multipleSelection: []
     }
   },
-  created() {
+  created () {
     this.getList()
     this.course_btn_add = this.permissions['exam:course:add']
     this.course_btn_edit = this.permissions['exam:course:edit']
@@ -160,7 +160,7 @@ export default {
     ])
   },
   methods: {
-    getList() {
+    getList () {
       this.listLoading = true
       fetchCourseList(this.listQuery).then(response => {
         this.list = response.data.list
@@ -170,38 +170,38 @@ export default {
         }, 500)
       })
     },
-    handleFilter() {
+    handleFilter () {
       this.listQuery.pageNum = 1
       this.getList()
     },
-    handleSizeChange(val) {
+    handleSizeChange (val) {
       this.listQuery.limit = val
       this.getList()
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       this.listQuery.pageNum = val
       this.getList()
     },
-    handleModifyStatus(row, status) {
+    handleModifyStatus (row, status) {
       row.status = status
       putObj(row).then(() => {
         this.dialogFormVisible = false
         messageSuccess(this, '操作成功')
       })
     },
-    handleSelectionChange(val) {
+    handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    sortChange(column, prop, order) {
+    sortChange (column, prop, order) {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
       this.getList()
     },
     // 点击选中
-    handleRowClick(row) {
+    handleRowClick (row) {
       this.$refs.multipleTable.toggleRowSelection(row, true)
     },
-    resetTemp() {
+    resetTemp () {
       this.temp = {
         id: '',
         courseName: '',
@@ -211,7 +211,7 @@ export default {
         courseDescription: ''
       }
     },
-    handleCreate() {
+    handleCreate () {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -219,7 +219,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    createData() {
+    createData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           addObj(this.temp).then(() => {
@@ -231,7 +231,7 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
+    handleUpdate (row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.status = parseInt(this.temp.status)
       this.temp.readonly = true
@@ -241,7 +241,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    updateData() {
+    updateData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
@@ -261,7 +261,7 @@ export default {
       })
     },
     // 删除
-    handleDelete(row) {
+    handleDelete (row) {
       this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -277,7 +277,7 @@ export default {
       }).catch(() => {})
     },
     // 批量删除
-    handleDeletes() {
+    handleDeletes () {
       if (checkMultipleSelect(this.multipleSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {

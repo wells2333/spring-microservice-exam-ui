@@ -20,44 +20,43 @@
       </el-upload>
     </div>
 
+    <spinner-loading v-if="listLoading"/>
     <el-table
-      v-loading="listLoading"
       :key="tableKey"
       :data="list"
-      border
       highlight-current-row
       style="width: 100%;"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column sortable prop="id" label="流水号" min-width="100" align="center">
+      <el-table-column sortable prop="id" label="流水号" min-width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.attachName')" sortable prop="attach_name" min-width="90" align="center">
+      <el-table-column :label="$t('table.attachName')" sortable prop="attach_name" min-width="90">
         <template slot-scope="scope">
           <span>{{ scope.row.attachName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.uploader')" min-width="90" align="center">
+      <el-table-column :label="$t('table.uploader')" min-width="90">
         <template slot-scope="scope">
           <span>{{ scope.row.creator }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="附件类型" min-width="90" align="center">
+      <el-table-column label="附件类型" min-width="90">
         <template slot-scope="scope">
           <span>{{ scope.row.busiType | attachmentTypeFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.uploadDate')" min-width="90" align="center">
+      <el-table-column :label="$t('table.uploadDate')" min-width="90">
         <template slot-scope="scope">
           <span>{{ scope.row.createDate }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleDownload(scope.row)">{{ $t('table.download') }}</el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
+          <el-button type="text" @click="handleDownload(scope.row)">{{ $t('table.download') }}</el-button>
+          <el-button type="text" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
           </el-button>
         </template>
       </el-table-column>
@@ -75,6 +74,7 @@ import waves from '@/directive/waves'
 import { getToken } from '@/utils/auth' // getToken from cookie
 import { notifySuccess, messageSuccess } from '@/utils/util'
 import { mapState } from 'vuex'
+import SpinnerLoading from '@/components/SpinnerLoading'
 
 const calendarTypeOptions = [
   { key: 'CN', display_name: 'China' },
@@ -91,24 +91,27 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 
 export default {
   name: 'AttachmentManagement',
+  components: {
+    SpinnerLoading
+  },
   directives: {
     waves
   },
   filters: {
-    statusTypeFilter(status) {
+    statusTypeFilter (status) {
       const statusMap = {
         0: 'success',
         1: 'danger'
       }
       return statusMap[status]
     },
-    statusFilter(status) {
+    statusFilter (status) {
       return status === '0' ? '启用' : '禁用'
     },
-    typeFilter(type) {
+    typeFilter (type) {
       return calendarTypeKeyValue[type]
     },
-    attachmentTypeFilter(type) {
+    attachmentTypeFilter (type) {
       let attachType
       if (type === '1') {
         attachType = '用户头像'
@@ -120,7 +123,7 @@ export default {
       return attachType
     }
   },
-  data() {
+  data () {
     return {
       tableKey: 0,
       list: null,
@@ -165,7 +168,7 @@ export default {
       percentage: 0
     }
   },
-  created() {
+  created () {
     this.getList()
   },
   computed: {
@@ -174,7 +177,7 @@ export default {
     })
   },
   methods: {
-    getList() {
+    getList () {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
         this.list = response.data.list
@@ -184,37 +187,37 @@ export default {
         }, 500)
       })
     },
-    handleFilter() {
+    handleFilter () {
       this.listQuery.pageNum = 1
       this.getList()
     },
-    handleSizeChange(val) {
+    handleSizeChange (val) {
       this.listQuery.limit = val
       this.getList()
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       this.listQuery.pageNum = val
       this.getList()
     },
-    handleModifyStatus(row, status) {
+    handleModifyStatus (row, status) {
       row.status = status
       putObj(row).then(() => {
         messageSuccess(this, '操作成功')
       })
     },
-    sortChange(column, prop, order) {
+    sortChange (column, prop, order) {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
       this.getList()
     },
-    resetTemp() {
+    resetTemp () {
       this.temp = {
         id: '',
         attachName: '',
         attachSize: ''
       }
     },
-    createData() {
+    createData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           addObj(this.temp).then(() => {
@@ -225,10 +228,10 @@ export default {
         }
       })
     },
-    handleDownload(row) {
+    handleDownload (row) {
       window.location.href = '/api/user/v1/attachment/download?id=' + row.id
     },
-    updateData() {
+    updateData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
@@ -240,7 +243,7 @@ export default {
       })
     },
     // 删除
-    handleDelete(row) {
+    handleDelete (row) {
       this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -252,12 +255,12 @@ export default {
         })
       }).catch(() => {})
     },
-    handleUploadSuccess() {
+    handleUploadSuccess () {
       this.uploading = false
       this.getList()
       notifySuccess(this, '上传成功')
     },
-    handleUploadProgress(event, file, fileList) {
+    handleUploadProgress (event, file, fileList) {
       this.uploading = true
       this.percentage = parseInt(file.percentage.toFixed(0))
     }

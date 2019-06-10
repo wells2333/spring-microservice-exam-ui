@@ -42,50 +42,48 @@
             <el-button v-if="subject_bank_btn_import" class="filter-item" icon="el-icon-upload2" plain @click="handleImportSubject">{{ $t('table.import') }}</el-button>
             <el-button v-if="subject_bank_btn_export" class="filter-item" icon="el-icon-download" plain @click="handleExportSubject">{{ $t('table.export') }}</el-button>
           </div>
+          <spinner-loading v-if="listLoading"/>
           <el-table
-            v-loading="listLoading"
             :data="list"
-            border
             highlight-current-row
             style="width: 100%;"
             @cell-dblclick="handleUpdateSubject"
             @selection-change="handleSubjectSelectionChange"
             @sort-change="sortSubjectChange">
             <el-table-column type="selection" width="55"/>
-            <el-table-column :label="$t('table.subject.serialNumber')" sortable prop="serial_number" property="serialNumber" min-width="20">
+            <el-table-column :label="$t('table.subject.serialNumber')" sortable prop="serial_number" property="serialNumber" width="80">
               <template slot-scope="scope">
                 <span>{{ scope.row.serialNumber }}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('table.subjectName')" sortable prop="subject_name" property="subjectName" min-width="120">
+            <el-table-column :label="$t('table.subjectName')" min-width="120">
               <template slot-scope="scope">
                 <span>{{ scope.row.subjectName | subjectNameFilter }}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('table.subject.category')" property="categoryName" min-width="60">
+            <el-table-column :label="$t('table.subject.category')" min-width="60">
               <template slot-scope="scope">
                 <span>{{ scope.row.categoryName}}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('table.subject.type')" sortable prop="type" property="type" width="120">
+            <el-table-column :label="$t('table.subject.type')" width="120">
               <template slot-scope="scope">
                 <el-tag type="success">{{ scope.row.type | subjectTypeFilter }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('table.subject.score')" sortable prop="score" property="score" width="120">
+            <el-table-column :label="$t('table.subject.score')" width="120">
               <template slot-scope="scope">
                 <span>{{ scope.row.score }}</span>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('table.subject.level')" sortable prop="level" property="level" width="120">
+            <el-table-column :label="$t('table.subject.level')" width="120">
               <template slot-scope="scope">
                 <el-rate v-model="scope.row.level" :max="4"/>
               </template>
             </el-table-column>
-            <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
+            <el-table-column :label="$t('table.actions')" class-name="status-col">
               <template slot-scope="scope">
-                <el-button v-if="subject_bank_btn_edit" type="primary" size="mini" @click="handleUpdateSubject(scope.row)">{{ $t('table.edit') }}</el-button>
-                <el-button v-if="subject_bank_btn_del" size="mini" type="danger" @click="handleDeleteSubject(scope.row)">{{ $t('table.delete') }}</el-button>
+                <el-button v-if="subject_bank_btn_edit" type="text" @click="handleUpdateSubject(scope.row)">{{ $t('table.edit') }}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -134,7 +132,9 @@
         <el-row>
           <el-col :span="12">
             <el-form-item :label="$t('table.subjectName')" prop="subjectName">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.subjectName" type="textarea"/>
+              <el-input v-model="tempSubject.subjectName">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(0)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -169,35 +169,45 @@
         <el-row v-if="tempSubject.type !== 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.content')" prop="content">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.content" type="textarea"/>
+              <el-input v-model="tempSubject.content">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(5)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionA')" prop="optionA">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionA" type="textarea"/>
+              <el-input v-model="tempSubject.optionA">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(1)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionB')" prop="optionB">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionB" type="textarea"/>
+              <el-input v-model="tempSubject.optionB">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(2)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionC')" prop="optionC">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionC" type="textarea"/>
+              <el-input v-model="tempSubject.optionC">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(3)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row v-if="tempSubject.type === 0">
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.optionD')" prop="optionD">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.optionD" type="textarea"/>
+              <el-input v-model="tempSubject.optionD">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(4)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -205,7 +215,9 @@
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.answer')" prop="answer">
               <!-- 非选择 -->
-              <el-input v-if="tempSubject.type !== 0" :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.answer" type="textarea"/>
+              <el-input v-if="tempSubject.type !== 0" v-model="tempSubject.answer">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(6)"></el-button>
+              </el-input>
               <!-- 选择题 -->
               <el-radio-group v-if="tempSubject.type === 0" v-model="tempSubject.answer">
                 <el-radio :label="'A'">A</el-radio>
@@ -219,7 +231,9 @@
         <el-row>
           <el-col :span="24">
             <el-form-item :label="$t('table.subject.analysis')" prop="analysis">
-              <el-input :autosize="{ minRows: 2, maxRows: 6}" v-model="tempSubject.analysis" type="textarea"/>
+              <el-input v-model="tempSubject.analysis">
+                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(7)"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -254,6 +268,15 @@
         </el-col>
       </el-row>
     </el-dialog>
+
+    <!-- 富文本编辑 -->
+    <el-dialog :visible.sync="tinymce.dialogTinymceVisible" :title="$t('table.edit')">
+      <tinymce ref="editor" :height="300" v-model="tinymce.tempValue" />
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="tinymce.dialogTinymceVisible = false">{{ $t('table.cancel') }}</el-button>
+        <el-button type="primary" @click="updateTinymceData">{{ $t('table.confirm') }}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -262,24 +285,29 @@ import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/exam/subjectCat
 import { fetchSubjectBankList, addSubjectBank, putSubjectBank, delSubjectBank, delAllSubjectBank, exportSubjectBank } from '@/api/exam/subjectBank'
 import { mapGetters } from 'vuex'
 import { getToken } from '@/utils/auth'
-import { checkMultipleSelect, exportExcel, notifySuccess, notifyFail, isNotEmpty } from '@/utils/util'
+import { checkMultipleSelect, exportExcel, notifySuccess, isNotEmpty } from '@/utils/util'
 import waves from '@/directive/waves'
+import Tinymce from '@/components/Tinymce'
+import SpinnerLoading from '@/components/SpinnerLoading'
 
 export default {
   name: 'SubjectManagement',
+  components: {
+    SpinnerLoading,
+    Tinymce
+  },
   directives: {
     waves
   },
-  components: {},
   filters: {
-    statusTypeFilter(status) {
+    statusTypeFilter (status) {
       const statusMap = {
         0: 'success',
         1: 'warning'
       }
       return statusMap[status]
     },
-    subjectTypeFilter(type) {
+    subjectTypeFilter (type) {
       const typeMap = {
         0: '选择题',
         1: '填空题',
@@ -288,14 +316,14 @@ export default {
       }
       return typeMap[type]
     },
-    subjectNameFilter(subjectName) {
+    subjectNameFilter (subjectName) {
       if (subjectName.length > 50) {
         return subjectName.substring(0, 50) + '...'
       }
       return subjectName
     }
   },
-  data() {
+  data () {
     return {
       baseUrl: '/exam',
       list: null,
@@ -406,10 +434,15 @@ export default {
       },
       headers: {
         Authorization: 'Bearer ' + getToken()
+      },
+      tinymce: {
+        type: 1, // 类型 0：题目名称，1：选项A，2：选择B，3：选项C，4：选项D
+        dialogTinymceVisible: false,
+        tempValue: ''
       }
     }
   },
-  created() {
+  created () {
     this.getList()
     this.handleSubjectManagement()
     this.subject_category_btn_add = this.permissions['exam:subject:category:add']
@@ -429,16 +462,16 @@ export default {
     ])
   },
   methods: {
-    getList() {
+    getList () {
       fetchTree(this.listQuery).then(response => {
         this.treeData = response.data
       })
     },
-    filterNode(value, data) {
+    filterNode (value, data) {
       if (!value) return true
       return data.label.indexOf(value) !== -1
     },
-    nodeExpand(data) {
+    nodeExpand (data) {
       const aChildren = data.children
       if (aChildren.length > 0) {
         this.oExpandedKey[data.id] = true
@@ -446,7 +479,7 @@ export default {
       }
       this.setExpandedKeys()
     },
-    nodeCollapse(data) {
+    nodeCollapse (data) {
       this.oExpandedKey[data.id] = false
       // 如果有子节点
       this.treeRecursion(this.oTreeNodeChildren[data.id], (oNode) => {
@@ -454,7 +487,7 @@ export default {
       })
       this.setExpandedKeys()
     },
-    setExpandedKeys() {
+    setExpandedKeys () {
       const oTemp = this.oExpandedKey
       this.aExpandedKeys = []
       for (const sKey in oTemp) {
@@ -463,7 +496,7 @@ export default {
         }
       }
     },
-    treeRecursion(aChildren, fnCallback) {
+    treeRecursion (aChildren, fnCallback) {
       if (aChildren) {
         for (let i = 0; i < aChildren.length; ++i) {
           const oNode = aChildren[i]
@@ -473,7 +506,7 @@ export default {
       }
     },
     // 点击分类
-    getNodeData(data) {
+    getNodeData (data) {
       // 获取分类信息
       getObj(data.id).then(response => {
         this.category = response.data.data
@@ -484,27 +517,27 @@ export default {
       // 获取题目信息
       this.handleSubjectManagement()
     },
-    handleFilter() {
+    handleFilter () {
       this.listQuery.pageNum = 1
       this.getList()
     },
-    handleSizeChange(val) {
+    handleSizeChange (val) {
       this.listQuery.limit = val
       this.getList()
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       this.listQuery.pageNum = val
       this.getList()
     },
-    handleSubjectSelectionChange(val) {
+    handleSubjectSelectionChange (val) {
       this.multipleSubjectSelection = val
     },
     // 切换题目类型
-    changeSubjectType(value) {
+    changeSubjectType (value) {
       console.log(value)
     },
     // 修改分类
-    handleUpdateCategory() {
+    handleUpdateCategory () {
       if (this.currentCategoryId === '') {
         this.$message({
           message: '请选择分类',
@@ -520,7 +553,7 @@ export default {
       })
     },
     // 点击主分类按钮
-    handleAddSuperCategory() {
+    handleAddSuperCategory () {
       this.resetCategoryForm()
       this.tempCategory.parentId = -1
       this.categoryFormStatus = 'create'
@@ -530,7 +563,7 @@ export default {
       })
     },
     // 点击子分类按钮
-    handleAddCategory() {
+    handleAddCategory () {
       if (this.currentCategoryId === '') {
         this.$message({
           message: '请选择分类',
@@ -546,7 +579,7 @@ export default {
       })
     },
     // 删除分类
-    handleDeleteCategory() {
+    handleDeleteCategory () {
       if (this.currentCategoryId === '') {
         this.$message({
           message: '请选择要删除的记录',
@@ -579,7 +612,7 @@ export default {
       })
     },
     // 新建分类
-    createCategory() {
+    createCategory () {
       this.$refs['dataCategoryForm'].validate((valid) => {
         if (valid) {
           addObj(this.tempCategory).then(() => {
@@ -591,7 +624,7 @@ export default {
       })
     },
     // 更新分类
-    updateCategory() {
+    updateCategory () {
       this.$refs['dataCategoryForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.tempCategory)
@@ -603,10 +636,10 @@ export default {
         }
       })
     },
-    onCancel() {
+    onCancel () {
       this.formStatus = ''
     },
-    resetCategoryForm() {
+    resetCategoryForm () {
       this.tempCategory = {
         categoryName: undefined,
         categoryDesc: undefined,
@@ -615,7 +648,7 @@ export default {
         sort: 30
       }
     },
-    resetTempSubject(serialNumber, score) {
+    resetTempSubject (serialNumber, score) {
       this.tempSubject = {
         id: '',
         examinationId: '',
@@ -645,7 +678,7 @@ export default {
       }
     },
     // 加载题目
-    handleSubjectManagement() {
+    handleSubjectManagement () {
       this.listLoading = true
       fetchSubjectBankList(this.listQuery).then(response => {
         if (response.data.list.length > 0) {
@@ -661,7 +694,7 @@ export default {
       })
     },
     // 点击新建题目
-    handleCreateSubject() {
+    handleCreateSubject () {
       if (this.currentCategoryId === '') {
         this.$message({
           message: '请选择分类',
@@ -677,7 +710,7 @@ export default {
       })
     },
     // 修改题目
-    handleUpdateSubject(row) {
+    handleUpdateSubject (row) {
       this.tempSubject = Object.assign({}, row) // copy obj
       this.tempSubject.status = parseInt(status)
       this.tempSubject.type = parseInt(row.type)
@@ -688,7 +721,7 @@ export default {
       })
     },
     // 删除题目
-    handleDeleteSubject(row) {
+    handleDeleteSubject (row) {
       this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -702,7 +735,7 @@ export default {
       })
     },
     // 保存题目
-    createSubjectData() {
+    createSubjectData () {
       this.$refs['dataSubjectForm'].validate((valid) => {
         if (valid) {
           // 绑定分类ID
@@ -716,7 +749,7 @@ export default {
       })
     },
     // 更新题目
-    updateSubjectData() {
+    updateSubjectData () {
       this.$refs['dataSubjectForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.tempSubject)
@@ -729,7 +762,7 @@ export default {
       })
     },
     // 更新并添加题目
-    updateAndAddSubjectData() {
+    updateAndAddSubjectData () {
       this.$refs['dataSubjectForm'].validate((valid) => {
         if (valid) {
           if (isNotEmpty(this.currentCategoryId)) {
@@ -766,7 +799,7 @@ export default {
       })
     },
     // 批量删除
-    handleDeletesSubject() {
+    handleDeletesSubject () {
       if (checkMultipleSelect(this.multipleSubjectSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSubjectSelection.length; i++) {
@@ -785,13 +818,13 @@ export default {
       }
     },
     // 点击排序按钮
-    sortSubjectChange(column, prop, order) {
+    sortSubjectChange (column, prop, order) {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
       this.handleSubjectManagement()
     },
     // 导出
-    handleExportSubject() {
+    handleExportSubject () {
       // 没选择题目，导出所有
       if (this.multipleSubjectSelection.length === 0 || this.currentCategoryId === '') {
         this.$confirm('是否导出所有题目?', '提示', {
@@ -825,7 +858,7 @@ export default {
       }
     },
     // 导入
-    handleImportSubject() {
+    handleImportSubject () {
       if (this.currentCategoryId === '') {
         this.$message({
           message: '请选择分类',
@@ -836,7 +869,7 @@ export default {
       this.dialogImportVisible = true
     },
     // 上传前
-    beforeUploadSubjectUpload(file) {
+    beforeUploadSubjectUpload (file) {
       const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       const isLt10M = file.size / 1024 / 1024 < 10
       if (!isExcel) {
@@ -847,16 +880,65 @@ export default {
       }
       return isExcel && isLt10M
     },
-    handleUploadSubjectProgress(event, file, fileList) {
+    handleUploadSubjectProgress (event, file, fileList) {
       this.uploadingSubject = true
       this.percentageSubject = parseInt(file.percentage.toFixed(0))
     },
     // 上传成功
-    handleUploadSubjectSuccess() {
+    handleUploadSubjectSuccess () {
       this.dialogImportVisible = false
       this.handleSubjectManagement()
       notifySuccess(this, '导入成功')
       this.uploadingSubject = false
+    },
+    // 富文本输入
+    tinymceSubmitName (type) {
+      this.tinymce.type = type
+      // 初始化富文本的内容
+      let content = ''
+      if (type === 0) {
+        content = this.tempSubject.subjectName
+      } else if (type === 1) {
+        content = this.tempSubject.optionA
+      } else if (type === 2) {
+        content = this.tempSubject.optionB
+      } else if (type === 3) {
+        content = this.tempSubject.optionC
+      } else if (type === 4) {
+        content = this.tempSubject.optionD
+      } else if (type === 5) {
+        content = this.tempSubject.content
+      } else if (type === 6) {
+        content = this.tempSubject.answer
+      } else if (type === 7) {
+        content = this.tempSubject.analysis
+      }
+      this.tinymce.dialogTinymceVisible = true
+      this.$refs.editor.setContent(content)
+    },
+    // 富文本保存
+    updateTinymceData () {
+      const content = this.$refs.editor.getContent()
+      // 编辑类型
+      const type = this.tinymce.type
+      if (type === 0) {
+        this.tempSubject.subjectName = content
+      } else if (type === 1) {
+        this.tempSubject.optionA = content
+      } else if (type === 2) {
+        this.tempSubject.optionB = content
+      } else if (type === 3) {
+        this.tempSubject.optionC = content
+      } else if (type === 4) {
+        this.tempSubject.optionD = content
+      } else if (type === 5) {
+        this.tempSubject.content = content
+      } else if (type === 6) {
+        this.tempSubject.answer = content
+      } else if (type === 7) {
+        this.tempSubject.analysis = content
+      }
+      this.tinymce.dialogTinymceVisible = false
     }
   }
 }

@@ -27,7 +27,7 @@ import ScrollPane from '@/components/ScrollPane'
 
 export default {
   components: { ScrollPane },
-  data() {
+  data () {
     return {
       visible: false,
       top: 0,
@@ -36,7 +36,7 @@ export default {
     }
   },
   computed: {
-    visitedViews() {
+    visitedViews () {
       // 处理第三方链接的菜单
       const views = this.$store.state.tagsView.visitedViews
       if (views !== undefined && views.length > 0) {
@@ -52,11 +52,11 @@ export default {
     }
   },
   watch: {
-    $route() {
+    $route () {
       this.addViewTags()
       this.moveToCurrentTag()
     },
-    visible(value) {
+    visible (value) {
       if (value) {
         document.body.addEventListener('click', this.closeMenu)
       } else {
@@ -64,27 +64,27 @@ export default {
       }
     }
   },
-  mounted() {
+  mounted () {
     this.addViewTags()
   },
   methods: {
-    generateRoute() {
+    generateRoute () {
       if (this.$route.name) {
         return this.$route
       }
       return false
     },
-    isActive(route) {
+    isActive (route) {
       return route.fullPath === this.$route.fullPath
     },
-    addViewTags() {
+    addViewTags () {
       const route = this.generateRoute()
       if (!route) {
         return false
       }
       this.$store.dispatch('addView', route)
     },
-    moveToCurrentTag() {
+    moveToCurrentTag () {
       const tags = this.$refs.tag
       this.$nextTick(() => {
         for (const tag of tags) {
@@ -95,7 +95,7 @@ export default {
         }
       })
     },
-    refreshSelectedTag(view) {
+    refreshSelectedTag (view) {
       this.closeSelectedTag(view)
       this.$store.dispatch('delCachedView', view).then(() => {
         const { fullPath } = view
@@ -106,7 +106,7 @@ export default {
         })
       })
     },
-    closeSelectedTag(view) {
+    closeSelectedTag (view) {
       this.$store.dispatch('delView', view).then(({ visitedViews }) => {
         if (this.isActive(view)) {
           const latestView = visitedViews.slice(-1)[0]
@@ -118,24 +118,24 @@ export default {
         }
       })
     },
-    closeOthersTags() {
+    closeOthersTags () {
       this.$router.push(this.selectedTag)
       this.$store.dispatch('delOthersViews', this.selectedTag).then(() => {
         this.moveToCurrentTag()
       })
     },
-    closeAllTags() {
+    closeAllTags () {
       this.$store.dispatch('delAllViews')
       this.$router.push('/')
     },
-    openMenu(tag, e) {
+    openMenu (tag, e) {
       this.visible = true
       this.selectedTag = tag
       const offsetLeft = this.$el.getBoundingClientRect().left // container margin left
       this.left = e.clientX - offsetLeft + 15 // 15: margin right
       this.top = e.clientY
     },
-    closeMenu() {
+    closeMenu () {
       this.visible = false
     }
   }

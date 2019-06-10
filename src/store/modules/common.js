@@ -30,8 +30,7 @@ const common = {
       state.isLock = true
       setStore({
         name: 'isLock',
-        content: state.isLock,
-        type: 'session'
+        content: state.isLock
       })
     },
     SET_THEME: (state, color) => {
@@ -45,8 +44,7 @@ const common = {
       state.lockPasswd = lockPasswd
       setStore({
         name: 'lockPasswd',
-        content: state.lockPasswd,
-        type: 'session'
+        content: state.lockPasswd
       })
     },
     CLEAR_LOCK: (state, action) => {

@@ -37,14 +37,14 @@ export default {
       type: Boolean
     }
   },
-  data() {
+  data () {
     return {}
   },
   methods: {
-    filterPath(path, index) {
+    filterPath (path, index) {
       return path == null ? index + '' : path
     },
-    open(item) {
+    open (item) {
       this.$router.push({
         path: resolveUrlPath(item.path, item.label),
         query: item.query

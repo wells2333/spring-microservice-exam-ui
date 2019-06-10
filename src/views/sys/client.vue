@@ -6,59 +6,40 @@
       <el-button v-if="client_btn_add" class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
       <el-button v-if="client_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
     </div>
-
+    <spinner-loading v-if="listLoading"/>
     <el-table
-      v-loading="listLoading"
       :key="tableKey"
       :data="list"
       :default-sort="{ prop: 'id', order: 'descending' }"
-      border
       highlight-current-row
       style="width: 100%;"
       @cell-dblclick="handleUpdate"
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.client.clientId')" sortable prop="client_id" min-width="90" align="center">
+      <el-table-column :label="$t('table.client.clientId')" sortable prop="client_id">
         <template slot-scope="scope">
           <span>{{ scope.row.clientId }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.client.clientSecretPlainText')" min-width="90" align="center">
+      <el-table-column :label="$t('table.client.clientSecretPlainText')">
         <template slot-scope="scope">
           <span>{{ scope.row.clientSecretPlainText }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.client.clientSecret')" min-width="90" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.clientSecret }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.client.scope')" min-width="90" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.scope }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.client.authorizedGrantTypes')" min-width="90" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.authorizedGrantTypes }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.client.accessTokenValidity')" align="center">
+      <el-table-column :label="$t('table.client.accessTokenValidity')">
         <template slot-scope="scope">
           <span>{{ scope.row.accessTokenValidity }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.client.refreshTokenValidity')" align="center">
+      <el-table-column :label="$t('table.client.refreshTokenValidity')" min-width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.refreshTokenValidity }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
+      <el-table-column :label="$t('table.actions')" class-name="status-col">
         <template slot-scope="scope">
-          <el-button v-if="client_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="client_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
-          </el-button>
+          <el-button v-if="client_btn_edit" type="text" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -70,12 +51,14 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="60%" top="10vh">
       <el-form ref="dataForm" :rules="rules" :model="temp" :label-position="labelPosition" label-width="100px">
         <el-row>
-          <el-col :span="12">
+          <el-col :span="24">
             <el-form-item :label="$t('table.client.clientId')" prop="clientId">
               <el-input v-model="temp.clientId"/>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+        </el-row>
+        <el-row>
+          <el-col :span="24">
             <el-form-item :label="$t('table.client.clientSecretPlainText')" prop="clientSecretPlainText">
               <el-input v-model="temp.clientSecretPlainText"/>
             </el-form-item>
@@ -84,30 +67,43 @@
         <el-row>
           <el-col :span="24">
             <el-form-item :label="$t('table.client.clientSecret')" prop="clientSecret">
-              <el-input v-model="temp.clientSecret" readonly="true" placeholder="密钥密文，自动生成"/>
+              <el-input v-model="temp.clientSecret" :readonly="true" placeholder="密钥密文，自动生成"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
+          <el-col :span="24">
             <el-form-item :label="$t('table.client.scope')" prop="scope">
-              <el-input v-model="temp.scope"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.client.authorizedGrantTypes')">
-              <el-input v-model="temp.authorizedGrantTypes"/>
+            <el-checkbox-group v-model="temp.scope">
+              <el-checkbox label="read"></el-checkbox>
+              <el-checkbox label="write"></el-checkbox>
+            </el-checkbox-group>
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
-          <el-col :span="12">
+          <el-col :span="24">
+            <el-form-item :label="$t('table.client.authorizedGrantTypes')">
+              <el-checkbox-group v-model="temp.authorizedGrantTypes">
+                <el-checkbox label="password"></el-checkbox>
+                <el-checkbox label="authorization_code"></el-checkbox>
+                <el-checkbox label="refresh_token"></el-checkbox>
+                <el-checkbox label="implicit"></el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="24">
             <el-form-item :label="$t('table.client.accessTokenValidity')">
               <el-input v-model="temp.accessTokenValidity"/>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+        </el-row>
+        <el-row>
+          <el-col :span="24">
             <el-form-item :label="$t('table.client.refreshTokenValidity')" prop="refreshTokenValidity">
               <el-input v-model="temp.refreshTokenValidity"/>
             </el-form-item>
@@ -128,13 +124,17 @@ import { fetchList, addObj, putObj, delObj, delAllObj } from '@/api/admin/client
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import { checkMultipleSelect, notifySuccess, messageSuccess } from '@/utils/util'
+import SpinnerLoading from '@/components/SpinnerLoading'
 
 export default {
   name: 'ClientManagement',
+  components: {
+    SpinnerLoading
+  },
   directives: {
     waves
   },
-  data() {
+  data () {
     return {
       tableKey: 0,
       list: null,
@@ -189,7 +189,7 @@ export default {
       client_btn_del: false
     }
   },
-  created() {
+  created () {
     this.getList()
     this.client_btn_add = this.permissions['sys:client:add']
     this.client_btn_edit = this.permissions['sys:client:edit']
@@ -202,7 +202,7 @@ export default {
     ])
   },
   methods: {
-    getList() {
+    getList () {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
         this.list = response.data.list
@@ -213,34 +213,34 @@ export default {
         }, 500)
       })
     },
-    handleFilter() {
+    handleFilter () {
       this.listQuery.pageNum = 1
       this.getList()
     },
-    handleSizeChange(val) {
+    handleSizeChange (val) {
       this.listQuery.limit = val
       this.getList()
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       this.listQuery.pageNum = val
       this.getList()
     },
-    handleModifyStatus(row, status) {
+    handleModifyStatus (row, status) {
       row.status = status
       putObj(row).then(() => {
         this.dialogFormVisible = false
         messageSuccess(this, '操作成功')
       })
     },
-    handleSelectionChange(val) {
+    handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    sortChange(column, prop, order) {
+    sortChange (column, prop, order) {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
       this.getList()
     },
-    resetTemp() {
+    resetTemp () {
       this.temp = {
         id: '',
         clientId: '',
@@ -257,7 +257,7 @@ export default {
         autoapprove: ''
       }
     },
-    handleCreate() {
+    handleCreate () {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -265,7 +265,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    createData() {
+    createData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           addObj(this.temp).then(() => {
@@ -277,18 +277,30 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
+    handleUpdate (row) {
       this.temp = Object.assign({}, row) // copy obj
+      if (this.temp.scope) {
+        this.temp.scope = this.temp.scope.split(',')
+      }
+      if (this.temp.authorizedGrantTypes) {
+        this.temp.authorizedGrantTypes = this.temp.authorizedGrantTypes.split(',')
+      }
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    updateData() {
+    updateData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
+          if (tempData.scope) {
+            tempData.scope = tempData.scope.join(',')
+          }
+          if (tempData.authorizedGrantTypes) {
+            tempData.authorizedGrantTypes = tempData.authorizedGrantTypes.join(',')
+          }
           putObj(tempData).then(() => {
             this.dialogFormVisible = false
             this.getList()
@@ -298,7 +310,7 @@ export default {
       })
     },
     // 删除
-    handleDelete(row) {
+    handleDelete (row) {
       this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -314,8 +326,8 @@ export default {
       }).catch(() => {})
     },
     // 批量删除
-    handleDeletes() {
-      if (checkMultipleSelect(this.multipleSelection, this )) {
+    handleDeletes () {
+      if (checkMultipleSelect(this.multipleSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids += this.multipleSelection[i].id + ','

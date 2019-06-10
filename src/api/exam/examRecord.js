@@ -2,14 +2,14 @@ import request from '@/router/axios'
 
 const baseExamRecordUrl = '/api/exam/v1/examRecord/'
 
-export function examRecordList() {
+export function examRecordList () {
   return request({
     url: baseExamRecordUrl + 'examRecordList',
     method: 'get'
   })
 }
 
-export function fetchExamRecordList(query) {
+export function fetchExamRecordList (query) {
   return request({
     url: baseExamRecordUrl + 'examRecordList',
     method: 'get',
@@ -17,14 +17,14 @@ export function fetchExamRecordList(query) {
   })
 }
 
-export function getObj(id) {
+export function getObj (id) {
   return request({
     url: baseExamRecordUrl + id,
     method: 'get'
   })
 }
 
-export function addObj(obj) {
+export function addObj (obj) {
   return request({
     url: baseExamRecordUrl,
     method: 'post',
@@ -32,7 +32,7 @@ export function addObj(obj) {
   })
 }
 
-export function putObj(obj) {
+export function putObj (obj) {
   return request({
     url: baseExamRecordUrl,
     method: 'put',
@@ -40,14 +40,14 @@ export function putObj(obj) {
   })
 }
 
-export function delObj(id) {
+export function delObj (id) {
   return request({
     url: baseExamRecordUrl + id,
     method: 'delete'
   })
 }
 
-export function delAllObj(obj) {
+export function delAllObj (obj) {
   return request({
     url: baseExamRecordUrl + 'deleteAll',
     method: 'post',
@@ -56,7 +56,7 @@ export function delAllObj(obj) {
 }
 
 // 导出
-export function exportObj(obj) {
+export function exportObj (obj) {
   return request({
     url: baseExamRecordUrl + 'export',
     method: 'post',

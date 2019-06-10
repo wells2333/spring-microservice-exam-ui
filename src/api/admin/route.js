@@ -2,14 +2,14 @@ import request from '@/router/axios'
 
 const baseRouteUrl = '/api/user/v1/route/'
 
-export function routeList() {
+export function routeList () {
   return request({
     url: baseRouteUrl + 'routeList',
     method: 'get'
   })
 }
 
-export function fetchList(query) {
+export function fetchList (query) {
   return request({
     url: baseRouteUrl + 'routeList',
     method: 'get',
@@ -17,14 +17,14 @@ export function fetchList(query) {
   })
 }
 
-export function getObj(id) {
+export function getObj (id) {
   return request({
     url: baseRouteUrl + id,
     method: 'get'
   })
 }
 
-export function addObj(obj) {
+export function addObj (obj) {
   return request({
     url: baseRouteUrl,
     method: 'post',
@@ -32,7 +32,7 @@ export function addObj(obj) {
   })
 }
 
-export function putObj(obj) {
+export function putObj (obj) {
   return request({
     url: baseRouteUrl,
     method: 'put',
@@ -40,14 +40,14 @@ export function putObj(obj) {
   })
 }
 
-export function delObj(id) {
+export function delObj (id) {
   return request({
     url: baseRouteUrl + id,
     method: 'delete'
   })
 }
 
-export function delAllObj(obj) {
+export function delAllObj (obj) {
   return request({
     url: baseRouteUrl + 'deleteAll',
     method: 'post',
@@ -55,7 +55,7 @@ export function delAllObj(obj) {
   })
 }
 
-export function refresh() {
+export function refresh () {
   return request({
     url: '/api/route/refresh',
     method: 'get'

@@ -1,7 +1,7 @@
 import './waves.css'
 
 export default{
-  bind(el, binding) {
+  bind (el, binding) {
     el.addEventListener('click', e => {
       const customOpts = Object.assign({}, binding.value)
       const opts = Object.assign({
@@ -39,4 +39,3 @@ export default{
     }, false)
   }
 }
-

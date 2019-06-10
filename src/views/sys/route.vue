@@ -7,49 +7,45 @@
       <el-button v-if="route_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
       <el-button v-if="route_btn_refresh" class="filter-item" icon="el-icon-refresh" plain @click="handleRefreshRoute">{{ $t('table.route.refresh') }}</el-button>
     </div>
-
+    <spinner-loading v-if="listLoading"/>
     <el-table
-      v-loading="listLoading"
       :key="tableKey"
       :data="list"
       :default-sort="{ prop: 'id', order: 'descending' }"
-      border
       highlight-current-row
       style="width: 100%;"
       @cell-dblclick="handleUpdate"
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.route.routeId')" sortable prop="route_id" min-width="90" align="center">
+      <el-table-column :label="$t('table.route.routeId')" sortable prop="route_id">
         <template slot-scope="scope">
           <span>{{ scope.row.routeId }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.route.routeName')" min-width="90" align="center">
+      <el-table-column :label="$t('table.route.routeName')">
         <template slot-scope="scope">
           <span>{{ scope.row.routeName }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.route.uri')" min-width="90" align="center">
+      <el-table-column :label="$t('table.route.uri')">
         <template slot-scope="scope">
           <span>{{ scope.row.uri }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.route.sort')" align="center">
+      <el-table-column :label="$t('table.route.sort')">
         <template slot-scope="scope">
           <span>{{ scope.row.sort }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.route.status')" align="center">
+      <el-table-column :label="$t('table.route.status')">
         <template slot-scope="scope">
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
+      <el-table-column :label="$t('table.actions')" class-name="status-col">
         <template slot-scope="scope">
-          <el-button v-if="route_btn_edit" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="route_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
-          </el-button>
+          <el-button v-if="route_btn_edit" type="text" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -124,26 +120,30 @@ import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import { checkMultipleSelect, notifySuccess, notifyFail, messageSuccess } from '@/utils/util'
 import JsonEditor from '@/components/JsonEditor'
+import SpinnerLoading from '@/components/SpinnerLoading'
 
 export default {
   name: 'ClientManagement',
+  components: {
+    SpinnerLoading,
+    JsonEditor
+  },
   directives: {
     waves
   },
-  components: { JsonEditor },
   filters: {
-    statusTypeFilter(status) {
+    statusTypeFilter (status) {
       const statusMap = {
         0: 'success',
         1: 'warning'
       }
       return statusMap[status]
     },
-    statusFilter(status) {
+    statusFilter (status) {
       return status === '0' ? '启用' : '禁用'
     }
   },
-  data() {
+  data () {
     return {
       tableKey: 0,
       list: null,
@@ -188,7 +188,7 @@ export default {
       route_btn_refresh: false
     }
   },
-  created() {
+  created () {
     this.getList()
     this.route_btn_add = this.permissions['sys:route:add']
     this.route_btn_edit = this.permissions['sys:route:edit']
@@ -202,7 +202,7 @@ export default {
     ])
   },
   methods: {
-    getList() {
+    getList () {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
         this.list = response.data.list
@@ -213,34 +213,34 @@ export default {
         }, 500)
       })
     },
-    handleFilter() {
+    handleFilter () {
       this.listQuery.pageNum = 1
       this.getList()
     },
-    handleSizeChange(val) {
+    handleSizeChange (val) {
       this.listQuery.limit = val
       this.getList()
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       this.listQuery.pageNum = val
       this.getList()
     },
-    handleModifyStatus(row, status) {
+    handleModifyStatus (row, status) {
       row.status = status
       putObj(row).then(() => {
         this.dialogFormVisible = false
         messageSuccess(this, '操作成功')
       })
     },
-    handleSelectionChange(val) {
+    handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    sortChange(column, prop, order) {
+    sortChange (column, prop, order) {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
       this.getList()
     },
-    resetTemp() {
+    resetTemp () {
       this.temp = {
         id: '',
         routeId: '',
@@ -254,7 +254,7 @@ export default {
         status: 0
       }
     },
-    handleCreate() {
+    handleCreate () {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -262,7 +262,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    createData() {
+    createData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.temp.predicates = this.$refs.predicatesJsonEditor.getValue()
@@ -276,7 +276,7 @@ export default {
         }
       })
     },
-    handleUpdate(row) {
+    handleUpdate (row) {
       this.temp = Object.assign({}, row) // copy obj
       this.dialogStatus = 'update'
       this.temp.tempPredicates = JSON.parse(this.temp.predicates)
@@ -287,7 +287,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    updateData() {
+    updateData () {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
@@ -302,7 +302,7 @@ export default {
       })
     },
     // 删除
-    handleDelete(row) {
+    handleDelete (row) {
       this.$confirm('确定要删除吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -318,8 +318,8 @@ export default {
       }).catch(() => {})
     },
     // 批量删除
-    handleDeletes() {
-      if (checkMultipleSelect(this.multipleSelection, this )) {
+    handleDeletes () {
+      if (checkMultipleSelect(this.multipleSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {
           ids += this.multipleSelection[i].id + ','
@@ -337,7 +337,7 @@ export default {
         }).catch(() => {})
       }
     },
-    handleRefreshRoute() {
+    handleRefreshRoute () {
       this.$confirm('确定要刷新路由吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

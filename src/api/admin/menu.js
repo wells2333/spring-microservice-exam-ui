@@ -3,14 +3,14 @@ import request from '@/router/axios'
 const baseMenuUrl = '/api/user/v1/menu/'
 
 /* 获取菜单 */
-export function GetMenu() {
+export function GetMenu () {
   return request({
     url: baseMenuUrl + 'userMenu',
     method: 'get'
   })
 }
 
-export function fetchTree(query) {
+export function fetchTree (query) {
   return request({
     url: baseMenuUrl + 'menus',
     method: 'get',
@@ -18,7 +18,7 @@ export function fetchTree(query) {
   })
 }
 
-export function addObj(obj) {
+export function addObj (obj) {
   return request({
     url: baseMenuUrl,
     method: 'post',
@@ -26,21 +26,21 @@ export function addObj(obj) {
   })
 }
 
-export function getObj(id) {
+export function getObj (id) {
   return request({
     url: baseMenuUrl + id,
     method: 'get'
   })
 }
 
-export function delObj(id) {
+export function delObj (id) {
   return request({
     url: baseMenuUrl + id,
     method: 'delete'
   })
 }
 
-export function putObj(obj) {
+export function putObj (obj) {
   return request({
     url: baseMenuUrl,
     method: 'put',
@@ -49,7 +49,7 @@ export function putObj(obj) {
 }
 
 // 导出
-export function exportObj(obj) {
+export function exportObj (obj) {
   return request({
     url: baseMenuUrl + 'export',
     method: 'post',
@@ -58,4 +58,3 @@ export function exportObj(obj) {
     data: obj
   })
 }
-

@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import Screenfull from '@/components/Screenfull'
@@ -59,9 +59,6 @@ import SizeSelect from '@/components/SizeSelect'
 import LangSelect from '@/components/LangSelect'
 import ThemePicker from '@/components/ThemePicker'
 import Lock from '@/components/Lock'
-import { getAttachmentPreviewUrl } from '@/utils/util'
-
-import { mapState } from 'vuex'
 
 export default {
   components: {
@@ -73,12 +70,12 @@ export default {
     ThemePicker,
     Lock
   },
-  data() {
+  data () {
     return {
       avatarUrl: ''
     }
   },
-  created() {
+  created () {
     this.userInfo.sex = parseInt(this.userInfo.sex)
   },
   computed: {
@@ -93,10 +90,10 @@ export default {
     })
   },
   methods: {
-    toggleSideBar() {
+    toggleSideBar () {
       this.$store.dispatch('toggleSideBar')
     },
-    logout() {
+    logout () {
       this.$store.dispatch('LogOut').then(() => {
         location.reload()// In order to re-instantiate the vue-router object to avoid bugs
       })

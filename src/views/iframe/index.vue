@@ -11,47 +11,47 @@ export default {
   name: 'Iframe',
   components: {
     ...mapGetters(['tagList']),
-    tagListNum: function() {
+    tagListNum: function () {
       return this.tagList.length !== 0
     }
   },
   props: ['routerPath'],
-  data() {
+  data () {
     return {
       urlPath: this.getUrlPath()
     }
   },
   watch: {
-    $route: function() {
+    $route: function () {
       this.load()
     },
-    routerPath: function(val) {
+    routerPath: function (val) {
       this.urlPath = this.getUrlPath()
     }
   },
-  created() {
+  created () {
     NProgress.configure({ showSpinner: false })
   },
-  mounted() {
+  mounted () {
     this.load()
   },
   methods: {
     // 显示等待框
-    show() {
+    show () {
       NProgress.start()
     },
     // 隐藏等待狂
-    hide() {
+    hide () {
       NProgress.done()
     },
     // 加载浏览器窗口变化自适应
-    resize() {
+    resize () {
       window.onresize = () => {
         this.iframeInit()
       }
     },
     // 加载组件
-    load() {
+    load () {
       this.resize()
       this.show()
       this.$route.query.src = this.$route.query.src
@@ -67,7 +67,7 @@ export default {
       }, 1000)
       this.iframeInit()
     },
-    iframeInit() {
+    iframeInit () {
       const iframe = this.$refs.iframe
       if (!iframe) {
         return
@@ -84,7 +84,7 @@ export default {
         }
       }
     },
-    getUrlPath: function() {
+    getUrlPath: function () {
       let url = window.location.href
       url = url.replace('/iframe', '')
       return url

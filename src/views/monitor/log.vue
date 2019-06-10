@@ -5,13 +5,11 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button v-if="log_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
     </div>
-
+    <spinner-loading v-if="listLoading"/>
     <el-table
-      v-loading="listLoading"
       :key="tableKey"
       :data="list"
       :default-sort="{ prop: 'create_date', order: 'descending' }"
-      border
       highlight-current-row
       style="width: 100%;"
       @cell-dblclick="handleUpdate"
@@ -23,44 +21,44 @@
           <el-tag :type="scope.row.type | statusTypeFilter">{{ scope.row.type | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.title')" prop="title" min-width="90" align="center">
+      <el-table-column :label="$t('table.log.title')" prop="title">
         <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.ip')" min-width="90" align="center">
+      <el-table-column :label="$t('table.log.ip')">
         <template slot-scope="scope">
           <span>{{ scope.row.ip }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.requestUri')" min-width="90" align="center">
+      <el-table-column :label="$t('table.log.requestUri')">
         <template slot-scope="scope">
           <span>{{ scope.row.requestUri }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.method')" width="120px" align="center">
+      <el-table-column :label="$t('table.log.method')">
         <template slot-scope="scope">
           <span>{{ scope.row.method }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.time')" align="center" width="160px">
+      <el-table-column :label="$t('table.log.time')">
         <template slot-scope="scope">
           <span>{{ scope.row.time }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.creator')" align="center" min-width="90">
+      <el-table-column :label="$t('table.log.creator')">
         <template slot-scope="scope">
           <span>{{ scope.row.creator }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.log.createDate')" sortable prop="createDate" align="center" width="160px">
+      <el-table-column :label="$t('table.log.createDate')" sortable prop="createDate">
         <template slot-scope="scope">
           <span>{{ scope.row.createDate }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col" width="200px">
+      <el-table-column :label="$t('table.actions')" class-name="status-col">
         <template slot-scope="scope">
-          <el-button v-if="log_btn_del" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
+          <el-button v-if="log_btn_del" type="text" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
           </el-button>
         </template>
       </el-table-column>
@@ -157,14 +155,18 @@ import { fetchList, delObj, delAllObj } from '@/api/admin/log'
 import { checkMultipleSelect } from '@/utils/util'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
+import SpinnerLoading from '@/components/SpinnerLoading'
 
 export default {
   name: 'LogManagement',
+  components: {
+    SpinnerLoading
+  },
   directives: {
     waves
   },
   filters: {
-    statusTypeFilter(status) {
+    statusTypeFilter (status) {
       const statusMap = {
         0: 'success',
         1: 'danger',
@@ -173,11 +175,11 @@ export default {
       }
       return statusMap[status]
     },
-    statusFilter(status) {
+    statusFilter (status) {
       return status === '0' ? '正常' : '访问'
     }
   },
-  data() {
+  data () {
     return {
       tableKey: 0,
       list: null,
@@ -201,7 +203,7 @@ export default {
       log_btn_del: false
     }
   },
-  created() {
+  created () {
     this.log_btn_del = this.permissions['monitor:log:del']
     this.getList()
   },
@@ -209,7 +211,7 @@ export default {
     ...mapGetters(['permissions'])
   },
   methods: {
-    getList() {
+    getList () {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
         this.list = response.data.list
@@ -220,27 +222,27 @@ export default {
         }, 500)
       })
     },
-    handleFilter() {
+    handleFilter () {
       this.listQuery.pageNum = 1
       this.getList()
     },
-    handleSizeChange(val) {
+    handleSizeChange (val) {
       this.listQuery.limit = val
       this.getList()
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       this.listQuery.pageNum = val
       this.getList()
     },
-    sortChange(column, prop, order) {
+    sortChange (column, prop, order) {
       this.listQuery.sort = column.prop
       this.listQuery.order = column.order
       this.getList()
     },
-    resetTemp() {
+    resetTemp () {
       this.temp = {}
     },
-    handleCreate() {
+    handleCreate () {
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
@@ -249,7 +251,7 @@ export default {
       })
     },
     // 删除
-    handleDelete(row) {
+    handleDelete (row) {
       delObj(row.id).then(() => {
         this.dialogFormVisible = false
         this.getList()
@@ -263,20 +265,20 @@ export default {
       const index = this.list.indexOf(row)
       this.list.splice(index, 1)
     },
-    getNodeData(data) {
+    getNodeData (data) {
       this.dialogDeptVisible = false
       this.temp.deptId = data.id
       this.temp.deptName = data.deptName
     },
-    handleUpdate(row) {
+    handleUpdate (row) {
       this.temp = Object.assign({}, row) // copy obj
       this.dialogFormVisible = true
     },
     // 选择行回调
-    handleSelectionChange(val) {
+    handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    handleDeletes() {
+    handleDeletes () {
       if (checkMultipleSelect(this.multipleSelection, this)) {
         let ids = ''
         for (let i = 0; i < this.multipleSelection.length; i++) {

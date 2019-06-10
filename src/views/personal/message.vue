@@ -9,14 +9,14 @@
                 <el-col :span="12">
                   <el-row>
                     <el-col :span="24">
-                      <el-form-item label="账号：" prop="username">
+                      <el-form-item label="账号" prop="username">
                         <el-input :disabled="disabled" v-model="userInfo.username"/>
                       </el-form-item>
                     </el-col>
                   </el-row>
                   <el-row>
                     <el-col :span="24">
-                      <el-form-item label="姓名：" prop="name">
+                      <el-form-item label="姓名" prop="name">
                         <el-input v-model="userInfo.name" placeholder="请输入姓名"/>
                       </el-form-item>
                     </el-col>
@@ -102,7 +102,7 @@ import store from '@/store'
 export default {
   name: 'PersonalMessage',
   components: {},
-  data() {
+  data () {
     return {
       labelPosition: 'right',
       disabled: true,
@@ -118,7 +118,7 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     this.userInfo.sex = parseInt(this.userInfo.sex)
   },
   computed: {
@@ -128,7 +128,7 @@ export default {
     })
   },
   methods: {
-    update() {
+    update () {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           updateObjInfo(this.userInfo).then(response => {
@@ -143,7 +143,7 @@ export default {
         }
       })
     },
-    handleAvatarSuccess(res, file) {
+    handleAvatarSuccess (res, file) {
       if (!isNotEmpty(res.data) || !isNotEmpty(res.data.fastFileId)) {
         notifyFail(this, '头像上传失败')
         return
@@ -188,7 +188,7 @@ export default {
         }
       })
     },
-    beforeAvatarUpload(file) {
+    beforeAvatarUpload (file) {
       const isJPG = file.type === 'image/jpeg' || file.type === 'image/png'
       const isLt2M = file.size / 1024 / 1024 < 2
       if (!isJPG) {

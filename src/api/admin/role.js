@@ -2,14 +2,14 @@ import request from '@/router/axios'
 
 const baseRoleUrl = '/api/user/v1/role/'
 
-export function roleList() {
+export function roleList () {
   return request({
     url: baseRoleUrl + 'roleList',
     method: 'get'
   })
 }
 
-export function fetchList(query) {
+export function fetchList (query) {
   return request({
     url: baseRoleUrl + 'roleList',
     method: 'get',
@@ -17,21 +17,22 @@ export function fetchList(query) {
   })
 }
 
-export function deptRoleList(deptId) {
+export function allRoles (query) {
   return request({
-    url: baseRoleUrl + 'roleList/' + deptId,
-    method: 'get'
+    url: baseRoleUrl + 'allRoles',
+    method: 'get',
+    params: query
   })
 }
 
-export function getObj(id) {
+export function getObj (id) {
   return request({
     url: baseRoleUrl + id,
     method: 'get'
   })
 }
 
-export function addObj(obj) {
+export function addObj (obj) {
   return request({
     url: baseRoleUrl,
     method: 'post',
@@ -39,7 +40,7 @@ export function addObj(obj) {
   })
 }
 
-export function putObj(obj) {
+export function putObj (obj) {
   return request({
     url: baseRoleUrl,
     method: 'put',
@@ -47,32 +48,32 @@ export function putObj(obj) {
   })
 }
 
-export function delObj(id) {
+export function delObj (id) {
   return request({
     url: baseRoleUrl + id,
     method: 'delete'
   })
 }
 
-export function permissionUpdate(id, menus) {
+export function permissionUpdate (id, menus) {
   return request({
     url: baseRoleUrl + 'roleMenuUpdate',
     method: 'put',
     data: {
       id: id,
-      deptId: menus
+      menuIds: menus
     }
   })
 }
 
-export function fetchRoleTree(roleName) {
+export function fetchRoleTree (roleName) {
   return request({
     url: '/api/user/v1/menu/roleTree/' + roleName,
     method: 'get'
   })
 }
 
-export function fetchDeptTree(query) {
+export function fetchDeptTree (query) {
   return request({
     url: '/api/user/v1/dept/depts',
     method: 'get',
@@ -80,7 +81,7 @@ export function fetchDeptTree(query) {
   })
 }
 
-export function delAllObj(obj) {
+export function delAllObj (obj) {
   return request({
     url: baseRoleUrl + 'deleteAll',
     method: 'post',

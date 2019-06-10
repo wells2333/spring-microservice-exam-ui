@@ -21,7 +21,7 @@ import { validatenull } from '@/utils/validate'
 import { mapGetters } from 'vuex'
 export default {
   name: 'lock',
-  data() {
+  data () {
     return {
       box: false,
       form: {
@@ -29,15 +29,15 @@ export default {
       }
     }
   },
-  created() {},
-  mounted() {},
+  created () {},
+  mounted () {},
   computed: {
     ...mapGetters(['lockPasswd'])
   },
   props: [],
   methods: {
     // 设置密码
-    handleSetLock() {
+    handleSetLock () {
       this.$refs['form'].validate(valid => {
         if (valid) {
           this.$store.commit('SET_LOCK_PASSWD', this.form.passwd)
@@ -45,7 +45,7 @@ export default {
         }
       })
     },
-    handleLock() {
+    handleLock () {
       if (validatenull(this.lockPasswd)) {
         this.box = true
         return

@@ -1,6 +1,6 @@
 {
-  "name": "online-exam-ui",
-  "version": "1.0.0",
+  "name": "spring-microservice-exam-ui",
+  "version": "3.0.0",
   "description": "在线考试",
   "author": "tangyi <1633736729@qq.com>",
   "private": true,
@@ -28,13 +28,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://gitee.com/wells2333/online-exam-ui"
+    "url": "git+https://gitee.com/wells2333/spring-microservice-exam-ui"
   },
   "bugs": {
-    "url": "https://gitee.com/wells2333/online-exam-ui/issues"
+    "url": "https://gitee.com/wells2333/spring-microservice-exam-ui/issues"
   },
   "dependencies": {
     "@tinymce/tinymce-vue": "^2.0.0",
+    "@vue/eslint-config-standard": "^4.0.0",
     "axios": "^0.18.0",
     "clipboard": "1.7.1",
     "codemirror": "^5.39.2",
@@ -67,6 +68,7 @@
     "vue-i18n": "7.3.2",
     "vue-particles": "^1.0.9",
     "vue-router": "3.0.1",
+    "vue-spinkit": "^1.4.1",
     "vue-splitpane": "1.0.2",
     "vuedraggable": "^2.16.0",
     "vuex": "3.0.1",
@@ -88,10 +90,10 @@
     "copy-webpack-plugin": "4.5.2",
     "cross-env": "5.2.0",
     "css-loader": "1.0.0",
-    "eslint": "4.19.1",
+    "eslint": "^4.19.1",
     "eslint-friendly-formatter": "4.0.1",
     "eslint-loader": "2.0.0",
-    "eslint-plugin-vue": "4.7.1",
+    "eslint-plugin-vue": "^4.7.1",
     "file-loader": "1.1.11",
     "friendly-errors-webpack-plugin": "1.7.0",
     "hash-sum": "1.0.2",

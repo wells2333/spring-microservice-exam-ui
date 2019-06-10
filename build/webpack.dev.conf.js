@@ -9,7 +9,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 
-function resolve(dir) {
+function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }
 
@@ -60,7 +60,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       title: '在线考试',
       path: config.dev.assetsPublicPath + config.dev.assetsSubDirectory,
       templateParameters: {
-        BASE_URL: config.dev.assetsPublicPath + config.dev.assetsSubDirectory,
+        BASE_URL: config.dev.assetsPublicPath + config.dev.assetsSubDirectory
       }
     })
   ]

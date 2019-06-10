@@ -39,7 +39,7 @@ axios.interceptors.response.use(data => {
     const originalRequest = error.config
     const currentRefreshToken = getRefreshToken()
     // 接口返回401并且已经重试过，自动刷新token
-    if (error.response.status === 401 && !originalRequest._retry && isNotEmpty(currentRefreshToken)) {
+    if ((error.response.status === 401 || error.response.status === 403) && !originalRequest._retry && isNotEmpty(currentRefreshToken)) {
       // 退出请求
       if (originalRequest.url.indexOf('removeToken') !== -1) {
         return
@@ -54,23 +54,16 @@ axios.interceptors.response.use(data => {
         return axios(originalRequest)
       }).catch(() => {
         // 刷新失败，执行退出
-        store.dispatch('LogOut').then(() => {
-          location.reload()
-        })
+        store.dispatch('LogOut').then(() => location.reload())
       })
     } else if (error.response.status === 423) {
-      Message({
-        message: '演示环境不能操作',
-        type: 'warning'
-      })
+      Message({ message: '演示环境不能操作', type: 'warning' })
     } else {
       // 其它错误则弹出提示
-      const code = error.response.data.code
-      const errMsg = errorCode[code] || errorCode['default']
-      Message({
-        message: errMsg,
-        type: 'error'
-      })
+      const { code, data } = error.response.data
+      const errMsg = data || errorCode[code] || errorCode['default']
+      // TODO 跳转到对应的404、500提示页面
+      Message({ message: errMsg, type: 'error' })
     }
   }
   return Promise.reject(new Error(error))
