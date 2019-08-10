@@ -47,16 +47,6 @@
                   </el-form-item>
                 </el-col>
               </el-row>
-              <el-row>
-                <el-col :span="12">
-                  <el-form-item :label="$t('table.status')">
-                    <el-radio-group v-model="form.status">
-                      <el-radio :label="0">启用</el-radio>
-                      <el-radio :label="1">禁用</el-radio>
-                    </el-radio-group>
-                  </el-form-item>
-                </el-col>
-              </el-row>
               <el-form-item>
                 <el-button type="primary" @click="create">保存</el-button>
                 <el-button @click="onCancel">取消</el-button>
@@ -117,8 +107,7 @@ export default {
         deptName: undefined,
         deptDesc: undefined,
         deptLeader: undefined,
-        sort: 30,
-        status: 0
+        sort: 30
       },
       currentId: '',
       rules: {
@@ -190,7 +179,6 @@ export default {
       this.formStatus = 'update'
       getObj(data.id).then(response => {
         this.form = response.data
-        this.form.status = parseInt(this.form.status)
       })
       this.currentId = data.id
       this.showElement = true
@@ -258,8 +246,7 @@ export default {
         deptName: undefined,
         deptDesc: undefined,
         deptLeader: undefined,
-        sort: 30,
-        status: 0
+        sort: 30
       }
     }
   }

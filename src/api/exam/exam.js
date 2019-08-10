@@ -10,10 +10,26 @@ export function fetchList (query) {
   })
 }
 
+export function fetchSubjectListById (query) {
+  return request({
+    url: baseExaminationUrl + query.examinationId + '/subjectList',
+    method: 'get',
+    params: query
+  })
+}
+
 export function getObj (id) {
   return request({
     url: baseExaminationUrl + id,
     method: 'get'
+  })
+}
+
+export function getSubjectCount (id, query) {
+  return request({
+    url: baseExaminationUrl + id + '/subjectCount',
+    method: 'get',
+    params: query
   })
 }
 

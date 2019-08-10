@@ -35,9 +35,10 @@
       </el-table-column>
       <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.status == 1" type="warning" size="mini" @click="handlePublic(scope.row, 0)">{{ $t('table.public') }}</el-button>
-          <el-button v-if="scope.row.status == 0" type="success" size="mini" @click="handlePublic(scope.row, 1)">{{ $t('table.retrieve') }}</el-button>
-          <el-button type="text" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="scope.row.status == 1" type="text" @click="handlePublic(scope.row, 0)" icon="el-icon-check">{{ $t('table.public') }}</el-button>
+          <el-button v-if="scope.row.status == 0" type="text" @click="handlePublic(scope.row, 1)" icon="el-icon-remove-outline">{{ $t('table.retrieve') }}</el-button>
+          <el-button type="text" @click="handleUpdate(scope.row)" icon="el-icon-edit">{{ $t('table.edit') }}</el-button>
+          <el-button type="text" @click="handleDelete(scope.row)" icon="el-icon-delete">{{ $t('table.delete') }}</el-button>
         </template>
       </el-table-column>
     </el-table>

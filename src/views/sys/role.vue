@@ -43,11 +43,11 @@
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col">
+      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
-          <el-button v-if="role_btn_edit" type="text" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="role_btn_del" type="text" @click="handleDelete(scope.row)">{{ $t('table.delete') }}</el-button>
-          <el-button v-if="role_btn_auth" type="text" @click="handlePermission(scope.row)">{{ $t('table.permission') }}</el-button>
+          <el-button v-if="role_btn_edit" type="text" @click="handleUpdate(scope.row)" icon="el-icon-edit">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="role_btn_del" type="text" @click="handleDelete(scope.row)" icon="el-icon-delete">{{ $t('table.delete') }}</el-button>
+          <el-button v-if="role_btn_auth" type="text" @click="handlePermission(scope.row)" icon="el-icon-circle-plus-outline">{{ $t('table.permission') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -97,6 +97,7 @@
         class="filter-tree"
         node-key="id"
         highlight-current
+        check-strictly
       />
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogPermissionVisible = false">{{ $t('table.cancel') }}</el-button>
@@ -128,10 +129,10 @@ export default {
       return statusMap[status]
     },
     statusFilter (status) {
-      return status === '0' ? '启用' : '禁用'
+      return status === 0 ? '启用' : '禁用'
     },
     isDefaultFilter (status) {
-      return status === '1' ? '是' : '否'
+      return status === 1 ? '是' : '否'
     }
   },
   data () {
@@ -153,7 +154,7 @@ export default {
         roleCode: '',
         roleDesc: '',
         status: 0,
-        isDefault: '0'
+        isDefault: 0
       },
       treeData: [],
       treePermissionData: [],
@@ -267,10 +268,6 @@ export default {
     },
     handleUpdate (row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.born = new Date(parseInt(this.temp.born))
-      this.temp.sex = parseInt(this.temp.sex)
-      this.temp.status = parseInt(this.temp.status)
-      this.temp.isDefault = parseInt(this.temp.isDefault)
       this.temp.readonly = true
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -283,13 +280,6 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           putObj(tempData).then(() => {
-            for (const v of this.list) {
-              if (v.id === this.temp.id) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
-              }
-            }
             this.dialogFormVisible = false
             this.getList()
             notifySuccess(this, '更新成功')
@@ -349,7 +339,6 @@ export default {
     },
     // 保存权限
     savePermission (id, roleCode) {
-      debugger
       const keys = this.$refs.menuTree.getCheckedKeys()
       let menus = ''
       if (keys.length > 0) {

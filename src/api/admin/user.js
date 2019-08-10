@@ -48,6 +48,22 @@ export function updateObjInfo (obj) {
   })
 }
 
+export function updatePassword (obj) {
+  return request({
+    url: baseUserUrl + 'updatePassword',
+    method: 'put',
+    data: obj
+  })
+}
+
+export function updateAvatar (obj) {
+  return request({
+    url: baseUserUrl + 'updateAvatar',
+    method: 'put',
+    data: obj
+  })
+}
+
 export function delAllObj (obj) {
   return request({
     url: baseUserUrl + 'deleteAll',

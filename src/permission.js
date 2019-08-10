@@ -31,29 +31,19 @@ router.beforeEach((to, from, next) => {
       next({ path: '/' })
       NProgress.done()
     } else {
-      if (store.getters.roles.length === 0) { // 判断当前用户是否已拉取完user_info信息
+      if (store.getters.userInfo.id === undefined) { // 判断当前用户是否已拉取完user_info信息
+        store.dispatch('GetUserInfo').then(res => { // 拉取user_info
+          next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
+        }).catch((err) => {
+          store.dispatch('FedLogOut').then(() => {
+            Message.error(err || 'Verification failed, please login again')
+            next({ path: '/' })
+          })
+        })
         // 获取附件配置信息
         if (store.getters.sysConfig.fdfsHttpHost === undefined) {
-          store.dispatch('GetSysConfig').then(res => {
-            store.dispatch('GetUserInfo').then(res => { // 拉取user_info
-              next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
-            }).catch((err) => {
-              store.dispatch('FedLogOut').then(() => {
-                Message.error(err || 'Verification failed, please login again')
-                next({ path: '/' })
-              })
-            })
-          }).catch(() => {
+          store.dispatch('GetSysConfig').then(res => {}).catch(() => {
             console.log('获取系统配置失败！')
-          })
-        } else {
-          store.dispatch('GetUserInfo').then(res => { // 拉取user_info
-            next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
-          }).catch((err) => {
-            store.dispatch('FedLogOut').then(() => {
-              Message.error(err || 'Verification failed, please login again')
-              next({ path: '/' })
-            })
           })
         }
       } else {

@@ -17,10 +17,11 @@ export function fetchSubjectList (query) {
   })
 }
 
-export function getObj (id) {
+export function getSubject (id, query) {
   return request({
     url: baseSubjectUrl + id,
-    method: 'get'
+    method: 'get',
+    params: query
   })
 }
 
@@ -40,10 +41,11 @@ export function putSubject (obj) {
   })
 }
 
-export function delSubject (id) {
+export function delSubject (id, query) {
   return request({
     url: baseSubjectUrl + id,
-    method: 'delete'
+    method: 'delete',
+    params: query
   })
 }
 

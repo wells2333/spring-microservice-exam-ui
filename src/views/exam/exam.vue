@@ -2,9 +2,6 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input :placeholder="$t('table.examinationName')" v-model="listQuery.examinationName" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
-      <el-select v-model="listQuery.courseId" :placeholder="$t('table.course')" style="width: 140px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in course.list" :key="item.id" :label="item.courseName" :value="item.id"/>
-      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.search') }}</el-button>
       <el-button v-if="exam_btn_add" class="filter-item" style="margin-left: 10px;" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
       <el-button v-if="exam_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
@@ -36,19 +33,14 @@
           <span>{{ scope.row | courseFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.startTime')" sortable prop="start_time">
+      <el-table-column :label="$t('table.startTime')">
         <template slot-scope="scope">
-          <span>{{ scope.row.startTime }}</span>
+          <span>{{ scope.row.startTime | timeFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.endTime')" sortable prop="end_time">
+      <el-table-column :label="$t('table.endTime')">
         <template slot-scope="scope">
-          <span>{{ scope.row.endTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.totalSubject')">
-        <template slot-scope="scope">
-          <span>{{ scope.row.totalSubject }}</span>
+          <span>{{ scope.row.endTime | timeFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.totalScore')">
@@ -61,12 +53,13 @@
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col">
+      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300">
         <template slot-scope="scope">
-          <el-button v-if="exam_btn_edit" type="text" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="exam_btn_edit && scope.row.status == 1" type="text" @click="handlePublic(scope.row, 0)">{{ $t('table.public') }}</el-button>
-          <el-button v-if="exam_btn_edit&& scope.row.status == 0" type="text" @click="handlePublic(scope.row, 1)">{{ $t('table.retrieve') }}</el-button>
-          <el-button v-if="exam_btn_subject" type="text" @click="handleSubjectManagement(scope.row)">{{ $t('table.subjectManagement') }}</el-button>
+          <el-button v-if="exam_btn_edit" type="text" @click="handleUpdate(scope.row)" icon="el-icon-edit">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="exam_btn_edit && scope.row.status == 1" type="text" @click="handlePublic(scope.row, 0)" icon="el-icon-check">{{ $t('table.public') }}</el-button>
+          <el-button v-if="exam_btn_edit && scope.row.status == 0" type="text" @click="handlePublic(scope.row, 1)" icon="el-icon-remove-outline">{{ $t('table.retrieve') }}</el-button>
+          <el-button v-if="exam_btn_subject" type="text" @click="handleSubjectManagement(scope.row)" icon="el-icon-document">{{ $t('table.subjectManagement') }}</el-button>
+          <el-button v-if="exam_btn_del" type="text" @click="handleDelete(scope.row)" icon="el-icon-delete">{{ $t('table.delete') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -94,18 +87,6 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item :label="$t('table.college')" prop="collegeId">
-                  <el-input v-model="temp.collegeId"/>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-form-item :label="$t('table.major')" prop="majorId">
-                  <el-input v-model="temp.majorId"/>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12">
                 <el-form-item :label="$t('table.course')" prop="course.id">
                   <el-input v-model="temp.course.courseName" @focus="selectCourse"/>
                   <input v-model="temp.course.id" type="hidden">
@@ -115,18 +96,18 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item :label="$t('table.startTime')" prop="startTime">
-                  <el-date-picker v-model="temp.startTime" :placeholder="$t('table.startTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
+                  <el-date-picker v-model="temp.startTime" :placeholder="$t('table.startTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="timestamp"/>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item :label="$t('table.endTime')" prop="endTime">
-                  <el-date-picker v-model="temp.endTime" :placeholder="$t('table.endTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="yyyy-MM-dd HH:mm"/>
+                  <el-date-picker v-model="temp.endTime" :placeholder="$t('table.endTime')" type="datetime" format="yyyy-MM-dd HH:mm" value-format="timestamp"/>
                 </el-form-item>
               </el-col>
             </el-row>
             <el-row>
               <el-col :span="12">
-                <el-form-item :label="$t('table.type')" prop="type">
+                <el-form-item :label="$t('table.examinationType')" prop="type">
                   <el-radio-group v-model="temp.type">
                     <el-radio :label="0">正式考试</el-radio>
                     <el-radio :label="1">模拟考试</el-radio>
@@ -167,7 +148,7 @@
               :headers="headers"
               :data="params"
               class="avatar-uploader">
-              <img v-if="temp.avatar" :src="getExaminationAvatar(temp.avatar)" class="avatar">
+              <img v-if="temp.avatarId !== null" :src="avatar" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"/>
             </el-upload>
           </el-col>
@@ -213,7 +194,6 @@
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilterSubject">{{ $t('table.search') }}</el-button>
         <el-button v-if="exam_btn_subject_add" class="filter-item" icon="el-icon-check" plain @click="handleCreateSubject">{{ $t('table.add') }}</el-button>
         <el-button v-if="exam_btn_subject_add" class="filter-item" icon="el-icon-check" plain @click="handleCreateSubjectFromSubjectBank">{{ $t('table.addFromSubjectBank') }}</el-button>
-        <el-button v-if="exam_btn_subject_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletesSubject">{{ $t('table.del') }}</el-button>
         <el-button v-if="exam_btn_subject_import" class="filter-item" icon="el-icon-upload2" plain @click="handleImportSubject">{{ $t('table.import') }}</el-button>
         <el-button v-if="exam_btn_subject_export" class="filter-item" icon="el-icon-download" plain @click="handleExportSubject">{{ $t('table.export') }}</el-button>
       </div>
@@ -226,7 +206,7 @@
         @cell-dblclick="handleUpdateSubject"
         @sort-change="sortSubjectChange">
         <el-table-column type="selection" width="55"/>
-        <el-table-column :label="$t('table.subject.serialNumber')" sortable prop="serial_number" property="serialNumber" min-width="20">
+        <el-table-column :label="$t('table.subject.serialNumber')" min-width="20">
           <template slot-scope="scope">
             <span>{{ scope.row.serialNumber }}</span>
           </template>
@@ -253,7 +233,8 @@
         </el-table-column>
         <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
           <template slot-scope="scope">
-            <el-button v-if="exam_btn_subject" type="text" @click="handleUpdateSubject(scope.row)">{{ $t('table.edit') }}</el-button>
+            <el-button v-if="exam_btn_subject" type="text" @click="handleUpdateSubject(scope.row)" icon="el-icon-edit">{{ $t('table.edit') }}</el-button>
+            <el-button v-if="exam_btn_del" type="text" @click="handleDeleteSubject(scope.row)" icon="el-icon-delete">{{ $t('table.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -263,116 +244,166 @@
     </el-dialog>
 
     <!--题目信息表单-->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogSubjectFormVisible" width="80%" top="10vh">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogSubjectFormVisible" width="80%" top="5vh">
       <el-form ref="dataSubjectForm" :rules="subjectRules" :model="tempSubject" :label-position="labelPosition" label-width="100px">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.subjectName')" prop="subjectName">
-              <el-input v-model="tempSubject.subjectName">
-                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(0)"></el-button>
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.subject.type')" prop="type">
-              <el-select v-model="tempSubject.type" class="filter-item" placeholder="请选择题目类型" width="100%" @change="changeSubjectType">
-                <el-option v-for="item in subjectTypeData" :key="item.id" :label="item.subjectTypeName" :value="item.id">
-                  <span style="float: left">{{ item.subjectTypeName }}</span>
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.subject.serialNumber')" prop="serialNumber">
-              <el-input v-model="tempSubject.serialNumber"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.subject.level')" prop="level">
-              <el-rate v-model="tempSubject.level" :max="4" :texts="['简单', '一般', '略难', '非常难']" show-text/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.subject.score')" prop="score">
-              <el-input v-model="tempSubject.score"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row v-if="tempSubject.type !== 0">
-          <el-col :span="24">
-            <el-form-item :label="$t('table.subject.content')" prop="content">
-              <el-input v-model="tempSubject.content">
-                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(5)"></el-button>
-              </el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row v-if="tempSubject.type === 0">
-          <el-col :span="24">
-            <el-form-item :label="$t('table.subject.optionA')" prop="optionA">
-              <el-input v-model="tempSubject.optionA">
-                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(1)"></el-button>
-              </el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row v-if="tempSubject.type === 0">
-          <el-col :span="24">
-            <el-form-item :label="$t('table.subject.optionB')" prop="optionB">
-              <el-input v-model="tempSubject.optionB">
-                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(2)"></el-button>
-              </el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row v-if="tempSubject.type === 0">
-          <el-col :span="24">
-            <el-form-item :label="$t('table.subject.optionC')" prop="optionC">
-              <el-input v-model="tempSubject.optionC">
-                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(3)"></el-button>
-              </el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row v-if="tempSubject.type === 0">
-          <el-col :span="24">
-            <el-form-item :label="$t('table.subject.optionD')" prop="optionD">
-              <el-input v-model="tempSubject.optionD">
-                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(4)"></el-button>
-              </el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item :label="$t('table.subject.answer')" prop="answer">
-              <!-- 非选择 -->
-              <el-input v-if="tempSubject.type !== 0" v-model="tempSubject.answer">
-                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(6)"></el-button>
-              </el-input>
-              <!-- 选择题 -->
-              <el-radio-group v-if="tempSubject.type === 0" v-model="tempSubject.answer">
-                <el-radio :label="'A'">A</el-radio>
-                <el-radio :label="'B'">B</el-radio>
-                <el-radio :label="'C'">C</el-radio>
-                <el-radio :label="'D'">D</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item :label="$t('table.subject.analysis')" prop="analysis">
-              <el-input v-model="tempSubject.analysis">
-                <el-button slot="append" icon="el-icon-edit" @click="tinymceSubmitName(7)"></el-button>
-              </el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
+        <el-tabs v-model="activeName" @tab-click="handleTabChange">
+          <!-- 选择题 -->
+          <el-tab-pane label="选择题" name="0" :disabled="tempSubject.type !== 0 && dialogStatus !== 'create'">
+            <el-row>
+              <el-col :span="10">
+                <div class="subject-info" v-if="tempSubject.type === 0">
+                  <el-row>
+                    <el-col :span="12">
+                      <el-form-item :label="$t('table.subject.serialNumber')" prop="serialNumber">
+                        <el-input v-model="tempSubject.serialNumber"/>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-form-item :label="$t('table.subject.type')" prop="type">
+                        <el-select v-model="tempSubject.choicesType" class="filter-item" placeholder="请选择题目类型" width="100%" @change="changeSubjectType">
+                          <el-option v-for="item in tempChoiceType" :key="item.type" :label="item.name" :value="item.type">
+                            <span style="float: left">{{ item.name }}</span>
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="12">
+                      <el-form-item :label="$t('table.subject.score')" prop="score">
+                        <el-input v-model="tempSubject.score"/>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-form-item :label="$t('table.subject.level')" prop="level">
+                        <el-rate v-model="tempSubject.level" :max="4" :texts="['简单', '一般', '略难', '非常难']" show-text/>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <el-form-item :label="$t('table.subjectName')" prop="subjectName">
+                        <el-input v-model="tempSubject.subjectName"/>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <el-form-item :label="$t('table.subject.optionA')">
+                        <el-input v-model="tempSubject.options[0].optionContent" @focus="updateTinymceContent(tempSubject.options[0].optionContent, tinymceEdit.optionA)"/>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <el-form-item :label="$t('table.subject.optionB')">
+                        <el-input v-model="tempSubject.options[1].optionContent" @focus="updateTinymceContent(tempSubject.options[1].optionContent, tinymceEdit.optionB)"/>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <el-form-item :label="$t('table.subject.optionC')">
+                        <el-input v-model="tempSubject.options[2].optionContent" @focus="updateTinymceContent(tempSubject.options[2].optionContent, tinymceEdit.optionC)"/>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <el-form-item :label="$t('table.subject.optionD')">
+                        <el-input v-model="tempSubject.options[3].optionContent" @focus="updateTinymceContent(tempSubject.options[3].optionContent, tinymceEdit.optionD)"/>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <el-form-item :label="$t('table.subject.answer')" prop="answer">
+                        <!-- 选择题 -->
+                        <el-radio-group v-model="tempSubject.answer.answer">
+                          <el-radio :label="'A'">A</el-radio>
+                          <el-radio :label="'B'">B</el-radio>
+                          <el-radio :label="'C'">C</el-radio>
+                          <el-radio :label="'D'">D</el-radio>
+                        </el-radio-group>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <el-form-item :label="$t('table.subject.analysis')" prop="analysis">
+                        <el-input v-model="tempSubject.analysis" @focus="updateTinymceContent(tempSubject.analysis, tinymceEdit.analysis)"/>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                </div>
+              </el-col>
+              <el-col :span="14">
+                <div class="subject-tinymce">
+                  <tinymce ref="choicesEditor" :height="350" v-model="choicesContent"/>
+                </div>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <!-- 简答题 -->
+          <el-tab-pane label="简答题" name="1" :disabled="tempSubject.type !== 1 && dialogStatus !== 'create'">
+            <el-row>
+              <el-col :span="10">
+                <div class="subject-info" v-if="tempSubject.type === 1">
+                  <el-row>
+                    <el-col :span="12">
+                      <el-form-item :label="$t('table.subject.serialNumber')" prop="serialNumber">
+                        <el-input v-model="tempSubject.serialNumber"/>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-form-item :label="$t('table.subject.type')">
+                        简答题
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="12">
+                      <el-form-item :label="$t('table.subject.score')" prop="score">
+                        <el-input v-model="tempSubject.score"/>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                      <el-form-item :label="$t('table.subject.level')" prop="level">
+                        <el-rate v-model="tempSubject.level" :max="4" :texts="['简单', '一般', '略难', '非常难']" show-text/>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <el-form-item :label="$t('table.subjectName')" prop="subjectName">
+                        <el-input v-model="tempSubject.subjectName" @focus="updateTinymceContent(tempSubject.subjectName, tinymceEdit.subjectName)"/>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <el-form-item :label="$t('table.subject.answer')" prop="answer">
+                        <el-input v-model="tempSubject.answer.answer" @focus="updateTinymceContent(tempSubject.answer.answer, tinymceEdit.answer)"/>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col :span="24">
+                      <el-form-item :label="$t('table.subject.analysis')" prop="analysis">
+                        <el-input v-model="tempSubject.analysis" @focus="updateTinymceContent(tempSubject.analysis, tinymceEdit.analysis)"/>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                </div>
+              </el-col>
+              <el-col :span="14">
+                <div class="subject-tinymce">
+                  <tinymce ref="shortAnswerEditor" :height="350" v-model="shortAnswerEditorContent"/>
+                </div>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+        </el-tabs>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogSubjectFormVisible = false">{{ $t('table.cancel') }}</el-button>
@@ -481,29 +512,19 @@
         <el-button type="primary" @click="handleSelectSubject">{{ $t('table.confirm') }}</el-button>
       </div>
     </el-dialog>
-
-    <!-- 富文本编辑 -->
-    <el-dialog :visible.sync="tinymce.dialogTinymceVisible" :title="$t('table.edit')">
-      <tinymce ref="editor" :height="300" v-model="tinymce.tempValue" />
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="tinymce.dialogTinymceVisible = false">{{ $t('table.cancel') }}</el-button>
-        <el-button type="primary" @click="updateTinymceData">{{ $t('table.confirm') }}</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList, addObj, putObj, delObj, delAllObj } from '@/api/exam/exam'
+import { fetchList, fetchSubjectListById, addObj, putObj, delObj, delAllObj } from '@/api/exam/exam'
 import { fetchCourseList } from '@/api/exam/course'
-import { fetchSubjectList, addSubject, putSubject, delSubject, delAllSubject, exportSubject } from '@/api/exam/subject'
-import { fetchSubjectBankList } from '@/api/exam/subjectBank'
-import { fetchTree } from '@/api/exam/subjectCategory'
+import { fetchSubjectList, getSubject, addSubject, putSubject, delSubject, delAllSubject, exportSubject } from '@/api/exam/subject'
+import { fetchCategoryTree } from '@/api/exam/subjectCategory'
 import waves from '@/directive/waves'
 import { mapGetters, mapState } from 'vuex'
 import { getToken } from '@/utils/auth'
-import { checkMultipleSelect, exportExcel, getAttachmentPreviewUrl, isNotEmpty, notifySuccess, notifyFail, messageSuccess } from '@/utils/util'
-import { delAttachment } from '@/api/admin/attachment'
+import { checkMultipleSelect, exportExcel, isNotEmpty, notifySuccess, notifyFail, messageSuccess, formatDate } from '@/utils/util'
+import { delAttachment, preview } from '@/api/admin/attachment'
 import Tinymce from '@/components/Tinymce'
 import SpinnerLoading from '@/components/SpinnerLoading'
 
@@ -535,9 +556,7 @@ export default {
     subjectTypeFilter (type) {
       const typeMap = {
         0: '选择题',
-        1: '填空题',
-        2: '判断题',
-        3: '简答题'
+        1: '简答题'
       }
       return typeMap[type]
     },
@@ -552,6 +571,9 @@ export default {
         return row.course.courseName
       }
       return ''
+    },
+    timeFilter (time) {
+      return formatDate(new Date(time), 'yyyy-MM-dd hh:mm')
     }
   },
   data () {
@@ -570,7 +592,6 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 10,
-        courseId: '',
         sort: 'create_date',
         order: 'descending'
       },
@@ -593,7 +614,7 @@ export default {
           pageSize: 10,
           examinationId: '',
           categoryId: '',
-          sort: 'serial_number',
+          sort: 'id',
           order: 'ascending'
         },
         list: null,
@@ -614,8 +635,7 @@ export default {
         totalScore: '',
         totalSubject: '0',
         status: 0,
-        avatar: '',
-        avatarId: '',
+        avatarId: null,
         collegeId: '',
         majorId: '',
         course: {
@@ -624,26 +644,43 @@ export default {
         },
         remark: ''
       },
+      avatar: null,
       // 题目临时信息
       tempSubject: {
         id: '',
-        serialNumber: '',
+        serialNumber: 1,
         examinationId: '',
-        categoryId: '',
+        categoryId: 0,
         subjectName: '',
         type: 0,
-        content: '',
-        optionA: '',
-        optionB: '',
-        optionC: '',
-        optionD: '',
-        optionE: '',
-        optionF: '',
-        answer: '',
-        score: '',
+        choicesType: 0,
+        options: [
+          { subjectChoicesId: '', optionName: 'A', optionContent: '' },
+          { subjectChoicesId: '', optionName: 'B', optionContent: '' },
+          { subjectChoicesId: '', optionName: 'C', optionContent: '' },
+          { subjectChoicesId: '', optionName: 'D', optionContent: '' }
+        ],
+        answer: {
+          subjectId: '',
+          answer: '',
+          answerType: '',
+          score: ''
+        },
+        score: 5,
         analysis: '',
         level: 2
       },
+      tempSubjectTypeList: [
+        { name: '选择题', type: 0 },
+        { name: '简答题', type: 1 }
+      ],
+      // 选择题类型
+      tempChoiceType: [
+        { type: 0, name: '单选题' },
+        { type: 1, name: '简答题' },
+        { type: 2, name: '判断题' },
+        { type: 3, name: '多选题' }
+      ],
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
@@ -653,8 +690,6 @@ export default {
       // 校验规则
       rules: {
         examinationName: [{ required: true, message: '请输入考试名称', trigger: 'change' }],
-        collegeId: [{ required: true, message: '请输入考试所属学院', trigger: 'change' }],
-        majorId: [{ required: true, message: '请输入考试所属专业', trigger: 'change' }],
         courseId: [{ required: true, message: '请输入考试所属课程', trigger: 'change' }],
         startTime: [{ required: true, message: '请选择开始时间', trigger: 'change' }],
         endTime: [{ required: true, message: '请选择结束时间', trigger: 'change' }],
@@ -664,11 +699,6 @@ export default {
       subjectRules: {
         subjectName: [{ required: true, message: '请输入题目名称', trigger: 'change' }],
         score: [{ required: true, message: '请输入题目分值', trigger: 'change' }],
-        content: [{ required: true, message: '请输入题目内容', trigger: 'change' }],
-        optionA: [{ required: true, message: '请输入选项A', trigger: 'change' }],
-        optionB: [{ required: true, message: '请输入选项B', trigger: 'change' }],
-        optionC: [{ required: true, message: '请输入选项C', trigger: 'change' }],
-        optionD: [{ required: true, message: '请输入选项D', trigger: 'change' }],
         answer: [{ required: true, message: '请输入答案', trigger: 'change' }]
       },
       downloadLoading: false,
@@ -688,7 +718,7 @@ export default {
       // 题目类型
       subjectTypeData: [
         { id: 0, subjectTypeName: '选择题' },
-        { id: 3, subjectTypeName: '简答题' }
+        { id: 1, subjectTypeName: '简答题' }
       ],
       // 多选考试
       multipleSelection: [],
@@ -710,9 +740,10 @@ export default {
         // 题目列表查询参数
         listQuery: {
           subjectName: undefined,
-          categoryId: undefined,
+          categoryId: 0,
           sort: 'serial_number',
-          order: 'ascending'
+          order: 'ascending',
+          type: 0
         },
         // 题目列表数据
         list: [],
@@ -730,8 +761,37 @@ export default {
       tinymce: {
         type: 1, // 类型 0：题目名称，1：选项A，2：选择B，3：选项C，4：选项D
         dialogTinymceVisible: false,
-        tempValue: ''
+        tempValue: '',
+        currentEdit: -1
+      },
+      activeName: '0',
+      choicesContent: '',
+      shortAnswerEditorContent: '',
+      // 编辑对象
+      tinymceEdit: {
+        subjectName: -1,
+        optionA: 0,
+        optionB: 1,
+        optionC: 2,
+        optionD: 3,
+        answer: 4,
+        analysis: 5
       }
+    }
+  },
+  watch: {
+    // 监听富文本编辑器的输入
+    choicesContent: {
+      handler: function (choicesContent) {
+        this.saveTinymceContent(choicesContent)
+      },
+      immediate: true
+    },
+    shortAnswerEditorContent: {
+      handler: function (shortAnswerEditorContent) {
+        this.saveTinymceContent(shortAnswerEditorContent)
+      },
+      immediate: true
     }
   },
   created () {
@@ -821,20 +881,32 @@ export default {
     },
     // 选择题目
     handleSelectSubject () {
-      // 隐藏弹框
-      this.category.dialogVisible = false
-      // 赋值给临时题目
-      this.tempSubject = this.category.singleSubjectSelection
-      // 清空题目ID
-      this.tempSubject.id = ''
-      // 清空分类ID
-      this.tempSubject.categoryId = ''
-      // 绑定考试ID
-      this.tempSubject.examinationId = this.subject.examinationId
-      // 状态为新建
-      this.dialogStatus = 'create'
-      // 显示题目信息表单
-      this.dialogSubjectFormVisible = true
+      // 加载题目信息
+      getSubject(this.category.singleSubjectSelection.id, { type: this.category.singleSubjectSelection.type }).then(response => {
+        this.tempSubject = response.data.data
+        // 隐藏弹框
+        this.category.dialogVisible = false
+        // 清空题目ID
+        this.tempSubject.id = ''
+        // 清空分类ID
+        this.tempSubject.categoryId = ''
+        // 清空选项ID
+        this.tempSubject.options.forEach(option => {
+          option.id = ''
+        })
+        // 绑定考试ID
+        this.tempSubject.examinationId = this.subject.examinationId
+        // 状态为新建
+        this.dialogStatus = 'create'
+        // 显示题目信息表单
+        this.dialogSubjectFormVisible = true
+        // 切换到对应的题型选项卡
+        this.updateCurrentTag(this.tempSubject.type)
+        // 初始化富文本
+        setTimeout(() => {
+          this.updateTinymceContent(this.tempSubject.subjectName, this.tinymceEdit.subjectName)
+        }, 300)
+      })
     },
     // 排序事件
     sortChange (column, prop, order) {
@@ -897,13 +969,17 @@ export default {
     },
     handleUpdate (row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.status = parseInt(this.temp.status)
-      this.temp.type = parseInt(this.temp.type)
       if (!isNotEmpty(this.temp.course)) {
         this.temp.course = {
           id: '',
           courseName: ''
         }
+      }
+      // 获取图片的预览地址
+      if (isNotEmpty(this.temp.avatarId)) {
+        preview(this.temp.avatarId).then(response => {
+          this.avatar = response.data.data
+        })
       }
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -990,7 +1066,7 @@ export default {
         this.subject.listQuery.examinationId = row.id
         this.params.examinationId = row.id
       }
-      fetchSubjectList(this.subject.listQuery).then(response => {
+      fetchSubjectListById(this.subject.listQuery).then(response => {
         if (response.data.list.length > 0) {
           for (let i = 0; i < response.data.list.length; i++) {
             const subject = response.data.list[i]
@@ -1009,7 +1085,7 @@ export default {
     // 加载题库列表
     handleSubjectBankManagement () {
       this.category.listLoading = true
-      fetchSubjectBankList(this.category.listQuery).then(response => {
+      fetchSubjectList(this.category.listQuery).then(response => {
         if (response.data.list.length > 0) {
           for (let i = 0; i < response.data.list.length; i++) {
             const subject = response.data.list[i]
@@ -1034,11 +1110,15 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataSubjectForm'].clearValidate()
       })
+      // 初始化富文本
+      setTimeout(() => {
+        this.updateTinymceContent(this.tempSubject.subjectName, this.tinymceEdit.subjectName)
+      }, 300)
     },
     // 从题库新增
     handleCreateSubjectFromSubjectBank () {
       // 加载分类树
-      fetchTree(this.category.listQuery).then(response => {
+      fetchCategoryTree(this.category.listQuery).then(response => {
         this.category.treeData = response.data
       })
       this.category.dialogVisible = true
@@ -1047,19 +1127,25 @@ export default {
     resetTempSubject (serialNumber, score) {
       this.tempSubject = {
         id: '',
+        serialNumber: 1,
         examinationId: '',
-        serialNumber: '',
+        categoryId: 0,
         subjectName: '',
         type: 0,
-        content: '',
-        optionA: '',
-        optionB: '',
-        optionC: '',
-        optionD: '',
-        optionE: '',
-        optionF: '',
-        answer: '',
-        score: '',
+        choicesType: 0,
+        options: [
+          { subjectChoicesId: '', optionName: 'A', optionContent: '' },
+          { subjectChoicesId: '', optionName: 'B', optionContent: '' },
+          { subjectChoicesId: '', optionName: 'C', optionContent: '' },
+          { subjectChoicesId: '', optionName: 'D', optionContent: '' }
+        ],
+        answer: {
+          subjectId: '',
+          answer: '',
+          answerType: '',
+          score: ''
+        },
+        score: 5,
         analysis: '',
         level: 2
       }
@@ -1075,15 +1161,20 @@ export default {
     },
     // 修改题目
     handleUpdateSubject (row) {
-      this.tempSubject = Object.assign({}, row) // copy obj
-      this.tempSubject.status = parseInt(status)
-      this.tempSubject.type = parseInt(row.type)
-      // 绑定考试ID
-      this.tempSubject.examinationId = this.subject.examinationId
-      this.dialogStatus = 'update'
-      this.dialogSubjectFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataSubjectForm'].clearValidate()
+      // 加载选项信息
+      getSubject(row.id, { type: row.type }).then(response => {
+        this.tempSubject = response.data.data
+        this.dialogStatus = 'update'
+        this.dialogSubjectFormVisible = true
+        this.$nextTick(() => {
+          this.$refs['dataSubjectForm'].clearValidate()
+        })
+        // 切换到对应的题型选项卡
+        this.updateCurrentTag(this.tempSubject.type)
+        // 初始化富文本
+        setTimeout(() => {
+          this.updateTinymceContent(this.tempSubject.subjectName, this.tinymceEdit.subjectName)
+        }, 300)
       })
     },
     // 删除题目
@@ -1093,7 +1184,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        delSubject(row.id).then(() => {
+        delSubject(row.id, { type: row.type }).then(() => {
           this.dialogSubjectFormVisible = false
           this.handleSubjectManagement()
           notifySuccess(this, '删除成功')
@@ -1269,12 +1360,11 @@ export default {
     handleAvatarSuccess (res, file) {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          if (isNotEmpty(this.temp.avatar)) {
+          if (isNotEmpty(this.temp.avatarId)) {
             // 删除旧头像
             delAttachment(this.temp.avatarId).then(() => {
               // 更新头像信息
               this.temp.avatarId = res.data.id
-              this.temp.avatar = res.data.fastFileId
               putObj(Object.assign({}, this.temp)).then(() => {
                 notifySuccess(this, '上传成功')
                 this.dialogFormVisible = false
@@ -1286,7 +1376,6 @@ export default {
           } else {
             // 更新头像信息
             this.temp.avatarId = res.data.id
-            this.temp.avatar = res.data.fastFileId
             putObj(Object.assign({}, this.temp)).then(() => {
               notifySuccess(this, '上传成功')
               this.dialogFormVisible = false
@@ -1298,57 +1387,52 @@ export default {
         }
       })
     },
-    getExaminationAvatar (avatar) {
-      return getAttachmentPreviewUrl(this.sysConfig, avatar)
+    // 切换题型
+    handleTabChange (tab, event) {
+      this.tempSubject.type = parseInt(tab.name)
     },
-    // 富文本输入
-    tinymceSubmitName (type) {
-      this.tinymce.type = type
-      // 初始化富文本的内容
-      let content = ''
-      if (type === 0) {
-        content = this.tempSubject.subjectName
-      } else if (type === 1) {
-        content = this.tempSubject.optionA
-      } else if (type === 2) {
-        content = this.tempSubject.optionB
-      } else if (type === 3) {
-        content = this.tempSubject.optionC
-      } else if (type === 4) {
-        content = this.tempSubject.optionD
-      } else if (type === 5) {
-        content = this.tempSubject.content
-      } else if (type === 6) {
-        content = this.tempSubject.answer
-      } else if (type === 7) {
-        content = this.tempSubject.analysis
+    // 绑定富文本的内容
+    updateTinymceContent (content, currentEdit) {
+      // 重置富文本
+      this.choicesContent = ''
+      this.shortAnswerEditorContent = ''
+      // 绑定当前编辑的对象
+      this.tinymce.currentEdit = currentEdit
+      // 选择题
+      if (this.tempSubject.type === 0) {
+        this.$refs.choicesEditor.setContent(content || '')
+      } else if (this.tempSubject.type === 1) {
+        this.$refs.shortAnswerEditor.setContent(content || '')
       }
-      this.tinymce.dialogTinymceVisible = true
-      this.$refs.editor.setContent(content)
     },
-    // 富文本保存
-    updateTinymceData () {
-      const content = this.$refs.editor.getContent()
-      // 编辑类型
-      const type = this.tinymce.type
-      if (type === 0) {
-        this.tempSubject.subjectName = content
-      } else if (type === 1) {
-        this.tempSubject.optionA = content
-      } else if (type === 2) {
-        this.tempSubject.optionB = content
-      } else if (type === 3) {
-        this.tempSubject.optionC = content
-      } else if (type === 4) {
-        this.tempSubject.optionD = content
-      } else if (type === 5) {
-        this.tempSubject.content = content
-      } else if (type === 6) {
-        this.tempSubject.answer = content
-      } else if (type === 7) {
-        this.tempSubject.analysis = content
+    // 保存题目时绑定富文本的内容到tempSubject
+    saveTinymceContent (content) {
+      switch (this.tinymce.currentEdit) {
+        case this.tinymceEdit.subjectName:
+          this.tempSubject.subjectName = content
+          break
+        case this.tinymceEdit.optionA:
+          this.tempSubject.options[0].optionContent = content
+          break
+        case this.tinymceEdit.optionB:
+          this.tempSubject.options[1].optionContent = content
+          break
+        case this.tinymceEdit.optionC:
+          this.tempSubject.options[2].optionContent = content
+          break
+        case this.tinymceEdit.optionD:
+          this.tempSubject.options[3].optionContent = content
+          break
+        case this.tinymceEdit.answer:
+          this.tempSubject.answer.answer = content
+          break
+        case this.tinymceEdit.analysis:
+          this.tempSubject.analysis = content
+          break
       }
-      this.tinymce.dialogTinymceVisible = false
+    },
+    updateCurrentTag (type) {
+      this.activeName = type + ''
     }
   }
 }
@@ -1371,10 +1455,10 @@ export default {
   .editor-content{
     margin-top: 20px;
   }
-  .subjectBankList {
-    margin: 24px 24px 0;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+  .subject-info {
+    padding-right: 12px;
+  }
+  .subject-tinymce {
+    padding-left: 12px;
   }
 </style>

@@ -38,9 +38,10 @@
           <span>{{ scope.row.teacher }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col">
+      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300">
         <template slot-scope="scope">
-          <el-button v-if="course_btn_edit" type="text" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="course_btn_edit" type="text" @click="handleUpdate(scope.row)" icon="el-icon-edit">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="course_btn_del" type="text" @click="handleDelete(scope.row)" icon="el-icon-delete">{{ $t('table.delete') }}</el-button>
         </template>
       </el-table-column>
     </el-table>

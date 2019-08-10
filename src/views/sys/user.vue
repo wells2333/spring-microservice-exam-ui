@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input placeholder="输入账号查询" v-model="listQuery.username" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input placeholder="输入姓名查询" v-model="listQuery.name" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('table.query') }}</el-button>
       <el-button v-if="user_btn_add" class="filter-item" icon="el-icon-check" plain @click="handleCreate">{{ $t('table.add') }}</el-button>
       <el-button v-if="user_btn_del" class="filter-item" icon="el-icon-delete" plain @click="handleDeletes">{{ $t('table.del') }}</el-button>
@@ -19,9 +19,9 @@
       @selection-change="handleSelectionChange"
       @sort-change="sortChange">
       <el-table-column type="selection" width="55"/>
-      <el-table-column :label="$t('table.username')" sortable prop="username" min-width="110">
+      <el-table-column :label="$t('login.identifier')" min-width="110">
         <template slot-scope="scope">
-          <span>{{ scope.row.username }}</span>
+          <span>{{ scope.row.identifier }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.name')" min-width="110">
@@ -59,12 +59,12 @@
           <el-tag :type="scope.row.status | statusTypeFilter">{{ scope.row.status | statusFilter }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" class-name="status-col">
+      <el-table-column :label="$t('table.actions')" class-name="status-col" width="300px">
         <template slot-scope="scope">
-          <el-button v-if="user_btn_edit" type="text"  @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
-          <el-button v-if="user_btn_edit  && scope.row.status === '0'" type="text" @click="handleEnableOrDisable(scope.row, '1')">{{ $t('table.disable') }}</el-button>
-          <el-button v-else type="text" @click="handleEnableOrDisable(scope.row, '0')">{{ $t('table.enable') }}</el-button>
-          <el-button v-if="user_btn_edit" type="text" @click="handleResetPassword(scope.row)">{{ $t('table.resetPassword') }}</el-button>
+          <el-button v-if="user_btn_edit" type="text"  @click="handleUpdate(scope.row)" icon="el-icon-edit">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="user_btn_edit  && scope.row.status === 0" type="text" @click="handleEnableOrDisable(scope.row, 1)" icon="el-icon-remove-outline">{{ $t('table.disable') }}</el-button>
+          <el-button v-else type="text" @click="handleEnableOrDisable(scope.row, 0)" icon="el-icon-check">{{ $t('table.enable') }}</el-button>
+          <el-button v-if="user_btn_edit" type="text" @click="handleResetPassword(scope.row)" icon="el-icon-refresh">{{ $t('table.resetPassword') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -77,13 +77,25 @@
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="right" label-width="100px" style="width: 90%;">
         <el-row>
           <el-col :span="12">
-            <el-form-item :label="$t('table.username')" prop="username">
-              <el-input v-model="temp.username" :readonly="temp.readonly" placeholder="账号"/>
+            <el-form-item :label="$t('login.identifier')" prop="identifier">
+              <el-input v-model="temp.identifier" :readonly="temp.readonly"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item :label="$t('table.name')" prop="name">
               <el-input v-model="temp.name" placeholder="姓名"/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.phone')" prop="phone">
+              <el-input v-model="temp.phone" placeholder="电话号码"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.email')" prop="email">
+              <el-input v-model="temp.email" placeholder="邮箱"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -103,25 +115,12 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item :label="$t('table.phone')" prop="phone">
-              <el-input v-model="temp.phone" placeholder="电话号码"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
             <el-form-item :label="$t('table.born')" prop="born">
-              <el-date-picker v-model="temp.born" type="date" format="yyyy 年 MM 月 dd 日" value-format="yyyy-MM-dd" placeholder="出生日期"/>
+              <el-date-picker v-model="temp.born" type="date" format="yyyy 年 MM 月 dd 日" value-format="timestamp" placeholder="出生日期"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
-            <el-form-item :label="$t('table.sex')">
-              <el-radio-group v-model="temp.sex">
-                <el-radio :label="0">男</el-radio>
-                <el-radio :label="1">女</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
           <el-col :span="12">
             <el-form-item :label="$t('table.status')">
               <el-radio-group v-model="temp.status">
@@ -130,11 +129,19 @@
               </el-radio-group>
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item :label="$t('table.sex')">
+              <el-radio-group v-model="temp.sex">
+                <el-radio :label="0">男</el-radio>
+                <el-radio :label="1">女</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
             <el-form-item :label="$t('table.remark')">
-              <el-input :autosize="{ minRows: 4, maxRows: 6}" v-model="temp.remark" type="textarea" placeholder="备注"/>
+              <el-input :autosize="{ minRows: 4, maxRows: 6}" v-model="temp.userDesc" type="textarea" placeholder="备注"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -256,7 +263,7 @@ export default {
       return statusMap[status]
     },
     statusFilter (status) {
-      return status === '0' ? '启用' : '禁用'
+      return status === 0 ? '启用' : '禁用'
     },
     sexFilter (type) {
       const sexMap = {
@@ -285,7 +292,7 @@ export default {
       listQuery: {
         pageNum: 1,
         pageSize: 10,
-        username: undefined,
+        name: undefined,
         sort: 'create_date',
         order: 'descending'
       },
@@ -300,7 +307,8 @@ export default {
         status: 0,
         deptId: null,
         roleId: null,
-        role: []
+        role: [],
+        userDesc: ''
       },
       tempRole: null,
       dialogFormVisible: false,
@@ -423,7 +431,8 @@ export default {
         readonly: false,
         deptId: null,
         roleId: null,
-        role: []
+        role: [],
+        userDesc: ''
       }
     },
     handleCreate () {
@@ -450,8 +459,6 @@ export default {
     },
     handleUpdate (row) {
       this.temp = Object.assign({}, row) // copy obj
-      this.temp.sex = parseInt(this.temp.sex)
-      this.temp.status = parseInt(this.temp.status)
       this.temp.readonly = true
       this.dialogStatus = 'update'
       if (isNotEmpty(this.temp.roleList) && this.temp.roleList.length > 0) {
@@ -514,7 +521,7 @@ export default {
     // 启用禁用
     handleEnableOrDisable (row, status) {
       row.status = status
-      const msg = status === '0' ? '启用' : '禁用'
+      const msg = status === 0 ? '启用' : '禁用'
       updateObjInfo(row).then(() => {
         this.getList()
         notifySuccess(this, msg + '成功')

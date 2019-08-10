@@ -43,7 +43,7 @@
       </el-table-column>
       <el-table-column :label="$t('table.log.time')">
         <template slot-scope="scope">
-          <span>{{ scope.row.time }}</span>
+          <span>{{ scope.row.time}}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.log.creator')">
@@ -53,7 +53,7 @@
       </el-table-column>
       <el-table-column :label="$t('table.log.createDate')" sortable prop="createDate">
         <template slot-scope="scope">
-          <span>{{ scope.row.createDate }}</span>
+          <span>{{ scope.row.createDate | timeFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.actions')" class-name="status-col">
@@ -152,7 +152,7 @@
 
 <script>
 import { fetchList, delObj, delAllObj } from '@/api/admin/log'
-import { checkMultipleSelect } from '@/utils/util'
+import { checkMultipleSelect, formatDate } from '@/utils/util'
 import waves from '@/directive/waves'
 import { mapGetters } from 'vuex'
 import SpinnerLoading from '@/components/SpinnerLoading'
@@ -176,7 +176,10 @@ export default {
       return statusMap[status]
     },
     statusFilter (status) {
-      return status === '0' ? '正常' : '访问'
+      return status === 0 ? '正常' : '访问'
+    },
+    timeFilter (time) {
+      return formatDate(new Date(time), 'yyyy-MM-dd hh:mm')
     }
   },
   data () {
@@ -262,8 +265,6 @@ export default {
           duration: 2000
         })
       })
-      const index = this.list.indexOf(row)
-      this.list.splice(index, 1)
     },
     getNodeData (data) {
       this.dialogDeptVisible = false

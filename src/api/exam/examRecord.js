@@ -40,6 +40,14 @@ export function putObj (obj) {
   })
 }
 
+export function completeMarking (obj) {
+  return request({
+    url: baseExamRecordUrl + 'completeMarking',
+    method: 'put',
+    data: obj
+  })
+}
+
 export function delObj (id) {
   return request({
     url: baseExamRecordUrl + id,

@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { updateObjInfo } from '@/api/admin/user'
+import { updatePassword } from '@/api/admin/user'
 import { mapState } from 'vuex'
 import { notifySuccess, notifyFail, isNotEmpty } from '@/utils/util'
 
@@ -94,7 +94,7 @@ export default {
     update () {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          updateObjInfo(this.userInfo).then(response => {
+          updatePassword(this.userInfo).then(response => {
             if (response.data.data) {
               notifySuccess(this, '修改成功')
               // 修改密码之后强制重新登录

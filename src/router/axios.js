@@ -1,6 +1,6 @@
 import axios from 'axios'
 import store from '../store'
-import { getToken, setToken, getRefreshToken } from '@/utils/auth'
+import { getToken, setToken, getRefreshToken, getTenantCode } from '@/utils/auth'
 import { isNotEmpty } from '@/utils/util'
 import { refreshToken } from '@/api/admin/login'
 import { Message } from 'element-ui'
@@ -23,6 +23,11 @@ axios.interceptors.request.use(config => {
     if (authorization === undefined || authorization.indexOf('Basic') === -1) {
       config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带token
     }
+  }
+  // 增加租户编号请求头
+  const tenantCode = config.headers['Tenant-Code']
+  if (tenantCode === undefined) {
+    config.headers['Tenant-Code'] = getTenantCode()
   }
   return config
 }, error => {

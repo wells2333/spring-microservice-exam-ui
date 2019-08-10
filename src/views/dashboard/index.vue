@@ -19,11 +19,13 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'roles'
+      'roles',
+      'userInfo',
+      'sysConfig'
     ])
   },
   created () {
-    if (!this.roles.includes('role_admin')) {
+    if (!this.roles.includes('role_admin') && this.userInfo.identifier !== this.sysConfig.adminUser) {
       this.currentRole = 'userDashboard'
     }
   }

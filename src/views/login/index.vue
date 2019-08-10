@@ -6,11 +6,11 @@
         <el-form-item prop="tenantCode">
           <el-input :placeholder="$t('login.tenantCode')" v-model="loginForm.tenantCode" name="tenantCode" type="text" auto-complete="on"/>
         </el-form-item>
-        <el-form-item prop="username">
-          <el-input :placeholder="$t('login.username')" v-model="loginForm.username" name="username" type="text" auto-complete="on"/>
+        <el-form-item prop="identifier">
+          <el-input :placeholder="$t('login.identifier')" v-model="loginForm.identifier" name="identifier" type="text" auto-complete="on"/>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input :placeholder="$t('login.password')" :type="passwordType" v-model="loginForm.password" name="password" auto-complete="on" @keyup.enter.native="handleLogin"/>
+          <el-input :placeholder="$t('login.credential')" :type="passwordType" v-model="loginForm.credential" name="credential" auto-complete="on" @keyup.enter.native="handleLogin"/>
         </el-form-item>
         <el-form-item prop="code">
           <el-row :span="24">
@@ -70,8 +70,8 @@ export default {
     return {
       loginForm: {
         tenantCode: '',
-        username: 'admin',
-        password: '123456',
+        identifier: '',
+        credential: '',
         code: '',
         randomStr: '',
         rememberMe: false
@@ -84,8 +84,8 @@ export default {
       },
       loginRules: {
         tenantCode: [{ required: true, trigger: 'blur', message: '请输入单位ID' }],
-        username: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
-        password: [
+        identifier: [{ required: true, trigger: 'blur', message: '请输入账号' }],
+        credential: [
           { required: true, trigger: 'blur', message: '请输入密码' },
           { min: 6, trigger: 'blur', message: '密码长度最少为6位' }],
         code: [

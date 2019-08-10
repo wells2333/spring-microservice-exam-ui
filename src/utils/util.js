@@ -237,7 +237,7 @@ export const checkMultipleSelect = (multipleSelection, obj) => {
  * 设置浏览器头部标题
  */
 export const setTitle = function (title) {
-  title = title ? `${title}——在线考试` : '在线考试'
+  title = title ? `${title}——系统演示` : '系统演示'
   window.document.title = title
 }
 
@@ -339,4 +339,34 @@ export const messageSuccess = (obj, message) => {
  */
 export const messageFail = (obj, message) => {
   obj.$message({ message: message, type: 'error' })
+}
+
+/**
+ * 格式化时间戳
+ * @param date
+ * @param fmt
+ * @returns {*}
+ */
+export const formatDate = (date, fmt) => {
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
+  }
+  let o = {
+    'M+': date.getMonth() + 1,
+    'd+': date.getDate(),
+    'h+': date.getHours(),
+    'm+': date.getMinutes(),
+    's+': date.getSeconds()
+  }
+  for (let k in o) {
+    if (new RegExp(`(${k})`).test(fmt)) {
+      let str = o[k] + ''
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : padLeftZero(str))
+    }
+  }
+  return fmt
+}
+
+export const padLeftZero = (str) => {
+  return ('00' + str).substr(str.length)
 }

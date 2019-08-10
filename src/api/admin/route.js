@@ -1,6 +1,6 @@
 import request from '@/router/axios'
 
-const baseRouteUrl = '/api/user/v1/route/'
+const baseRouteUrl = '/api/route/v1/route/'
 
 export function routeList () {
   return request({
@@ -57,7 +57,7 @@ export function delAllObj (obj) {
 
 export function refresh () {
   return request({
-    url: '/api/route/refresh',
+    url: baseRouteUrl + 'refresh',
     method: 'get'
   })
 }
